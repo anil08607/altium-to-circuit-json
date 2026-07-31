@@ -1,13 +1,13 @@
 import { expect, test } from "bun:test"
 import { parseAltiumSchDoc, serializeAltiumSheetToSvg } from "altiumts"
 import { any_circuit_element } from "circuit-json"
-import { convertCircuitJsonToSchematicSvg } from "circuit-to-svg"
 import { convertAltiumSchDocToCircuitJson } from "../../../lib"
 import {
   TI_TMDS62LEVM_FIXTURE_NAME,
   TI_TMDS62LEVM_SCHEMATIC_SHEET_NUMBERS,
 } from "../../../scripts/references/reference-manifest"
 import { readReferenceBytes } from "../../helpers/read-reference"
+import { renderImportedSchematicToSvg } from "../../helpers/render-imported-schematic"
 import { stackAltiumAndCircuitJsonSvgs } from "../../helpers/stack-svg-comparison"
 
 for (const sheetNumber of TI_TMDS62LEVM_SCHEMATIC_SHEET_NUMBERS) {
@@ -37,7 +37,7 @@ for (const sheetNumber of TI_TMDS62LEVM_SCHEMATIC_SHEET_NUMBERS) {
         title: `${title} — altiumts source`,
         width: 800,
       })
-      const circuitJsonSvg = convertCircuitJsonToSchematicSvg(circuitJson)
+      const circuitJsonSvg = renderImportedSchematicToSvg(circuitJson)
       const comparisonSvg = stackAltiumAndCircuitJsonSvgs(
         altiumSvg,
         circuitJsonSvg,
