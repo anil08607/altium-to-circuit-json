@@ -1,0 +1,65 @@
+{
+  "name": "altium-to-circuit-json",
+  "version": "0.0.1",
+  "description": "Convert Altium schematic and PCB documents into Circuit JSON",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tscircuit/altium-to-circuit-json"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsup-node lib/index.ts --format esm --dts --sourcemap --clean",
+    "download-references": "bun run scripts/download-references.ts",
+    "format": "biome format --write .",
+    "format:check": "biome format .",
+    "lint": "biome check .",
+    "prepack": "bun run build",
+    "test": "bun run download-references && bun test",
+    "test:update-svg": "bun run download-references && BUN_UPDATE_SNAPSHOTS=1 bun test tests/svg",
+    "typecheck": "bunx tsc --noEmit"
+  },
+  "dependencies": {
+    "altiumts": "^0.0.13",
+    "circuit-json": "^0.0.456"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.5.6",
+    "@tscircuit/alphabet": "^0.0.25",
+    "@tscircuit/circuit-json-util": "^0.0.102",
+    "@types/bun": "^1.3.14",
+    "bun-match-svg": "^0.0.15",
+    "circuit-json-to-connectivity-map": "^0.0.25",
+    "circuit-to-svg": "^0.0.394",
+    "format-si-unit": "^0.0.11",
+    "schematic-symbols": "^0.0.238",
+    "sharp": "^0.35.3",
+    "stack-svgs": "^0.0.1",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3",
+    "zod": "^3.25.76"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "overrides": {
+    "sharp": "^0.35.3"
+  }
+}
