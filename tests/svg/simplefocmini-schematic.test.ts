@@ -1,9 +1,9 @@
 import { expect, test } from "bun:test"
 import { parseAltiumSchDoc, serializeAltiumSheetToSvg } from "altiumts"
 import { any_circuit_element } from "circuit-json"
-import { convertCircuitJsonToSchematicSvg } from "circuit-to-svg"
 import { convertAltiumToCircuitJson } from "../../lib"
 import { readReferenceBytes } from "../helpers/read-reference"
+import { renderImportedSchematicToSvg } from "../helpers/render-imported-schematic"
 import { stackAltiumAndCircuitJsonSvgs } from "../helpers/stack-svg-comparison"
 
 test(
@@ -37,7 +37,7 @@ test(
       title: "altiumts source rendering",
       width: 800,
     })
-    const circuitJsonSvg = convertCircuitJsonToSchematicSvg(circuitJson)
+    const circuitJsonSvg = renderImportedSchematicToSvg(circuitJson)
     const comparisonSvg = stackAltiumAndCircuitJsonSvgs(
       altiumSvg,
       circuitJsonSvg,

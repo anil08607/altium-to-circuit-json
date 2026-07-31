@@ -305,35 +305,84 @@ function convertSchematicRecord(
     const rectangle = getRectangle(record)
     const text = decodeMultilineText(record.getDecoded("TEXT") ?? "")
     if (!rectangle || !text || options.includeText === false) return []
-    const rect = {
-      type: "schematic_rect",
-      schematic_rect_id: `schematic_text_frame_altium_${index}`,
-      schematic_sheet_id: SCHEMATIC_SHEET_ID,
-      center: scalePoint(
-        {
-          x: (rectangle.minX + rectangle.maxX) / 2,
-          y: (rectangle.minY + rectangle.maxY) / 2,
-        },
-        scale,
-      ),
-      width: (rectangle.maxX - rectangle.minX) * scale,
-      height: (rectangle.maxY - rectangle.minY) * scale,
-      rotation: 0,
-      stroke_width: strokeWidth,
-      color,
-      is_filled: false,
-      is_dashed: false,
-    } satisfies SchematicRect
-    const textElement = createText(
-      record,
-      index,
-      text,
-      { x: rectangle.minX + 2, y: rectangle.maxY - 2 },
-      color,
-      context,
-      "top_left",
+    const fontSize = getFontSize(record, context)
+    const fontFamily = getFontFamily(record, context)
+    const margin = Math.max(getCoordinate(record, "TEXTMARGIN", 0), 0)
+    const frameWidth = rectangle.maxX - rectangle.minX
+    const frameHeight = rectangle.maxY - rectangle.minY
+    const availableWidth = Math.max(frameWidth - margin * 2, fontSize)
+    const availableHeight = Math.max(frameHeight - margin * 2, fontSize)
+    const wrappedLines =
+      record.getBoolean("WORDWRAP") === false
+        ? text.split("\n")
+        : wrapSchematicText(text, availableWidth, fontSize, fontFamily)
+    const lineHeight = fontSize
+    const visibleLines =
+      record.getBoolean("CLIPTORECT") === false
+        ? wrappedLines
+        : wrappedLines.slice(
+            0,
+            Math.max(Math.ceil(availableHeight / lineHeight), 1),
+          )
+    const alignment = Number(record.getCaseInsensitive("ALIGNMENT") ?? 1)
+    const horizontalAnchor =
+      alignment === 2 ? "center" : alignment === 3 ? "right" : "left"
+    const textX =
+      horizontalAnchor === "center"
+        ? (rectangle.minX + rectangle.maxX) / 2
+        : horizontalAnchor === "right"
+          ? rectangle.maxX - margin
+          : rectangle.minX + margin
+    const textColor = altiumColorToCss(
+      record.getCaseInsensitive("TEXTCOLOR") ??
+        record.getCaseInsensitive("COLOR"),
+      "#1f2937",
     )
-    return [rect, textElement]
+    const elements: AnyCircuitElement[] = visibleLines.map((line, lineIndex) =>
+      createDirectText(
+        `schematic_text_frame_line_altium_${index}_${lineIndex}`,
+        line,
+        {
+          x: textX,
+          y: rectangle.maxY - margin - lineIndex * lineHeight,
+        },
+        fontSize,
+        textColor,
+        scale,
+        0,
+        `top_${horizontalAnchor}` as SchematicText["anchor"],
+      ),
+    )
+
+    const isSolid = record.getBoolean("ISSOLID") === true
+    const showBorder = record.getBoolean("SHOWBORDER") === true
+    if (isSolid || showBorder) {
+      elements.unshift({
+        type: "schematic_rect",
+        schematic_rect_id: `schematic_text_frame_altium_${index}`,
+        schematic_sheet_id: SCHEMATIC_SHEET_ID,
+        center: scalePoint(
+          {
+            x: (rectangle.minX + rectangle.maxX) / 2,
+            y: (rectangle.minY + rectangle.maxY) / 2,
+          },
+          scale,
+        ),
+        width: frameWidth * scale,
+        height: frameHeight * scale,
+        rotation: 0,
+        stroke_width: showBorder ? strokeWidth : 0,
+        color: showBorder ? color : "transparent",
+        is_filled: isSolid,
+        fill_color: altiumColorToCss(
+          record.getCaseInsensitive("AREACOLOR"),
+          "#ffffff",
+        ),
+        is_dashed: false,
+      } satisfies SchematicRect)
+    }
+
+    return elements
   }
 
   return []
@@ -396,7 +445,7 @@ function convertPin(
           x: location.x - direction.x * textOffset,
           y: location.y - direction.y * textOffset,
         },
-        0.6,
+        6,
         color,
         context.scale,
         rotation,
@@ -413,7 +462,7 @@ function convertPin(
           x: location.x + direction.x * textOffset,
           y: location.y + direction.y * textOffset,
         },
-        0.6,
+        6,
         color,
         context.scale,
         rotation,
@@ -433,36 +482,175 @@ function convertPowerPort(
 ): AnyCircuitElement[] {
   const location = getLocation(record)
   if (!location) return []
-  const points = [
-    { x: location.x, y: location.y },
-    { x: location.x - 5, y: location.y + 7 },
-    { x: location.x + 5, y: location.y + 7 },
-  ]
-  const elements: AnyCircuitElement[] = [
-    {
+  const orientation =
+    ((Math.round(record.getNumber("ORIENTATION") ?? 0) % 4) + 4) % 4
+  const direction = [
+    { x: 1, y: 0 },
+    { x: 0, y: 1 },
+    { x: -1, y: 0 },
+    { x: 0, y: -1 },
+  ][orientation] ?? { x: 1, y: 0 }
+  const perpendicular = { x: -direction.y, y: direction.x }
+  const point = (along: number, across = 0): AltiumPoint => ({
+    x: location.x + direction.x * along + perpendicular.x * across,
+    y: location.y + direction.y * along + perpendicular.y * across,
+  })
+  const style = Math.round(Number(record.getCaseInsensitive("STYLE") ?? 2))
+  const elements: AnyCircuitElement[] = []
+  let labelDistance: number
+
+  if (style === 2) {
+    elements.push(
+      createLine(
+        index,
+        location,
+        point(8),
+        color,
+        0.1,
+        context.scale,
+        "power_port_stem",
+      ),
+      createLine(
+        index,
+        point(8, -5),
+        point(8, 5),
+        color,
+        0.1,
+        context.scale,
+        "power_port_bar",
+      ),
+    )
+    labelDistance = 12
+  } else if (style === 5) {
+    elements.push(
+      createLine(
+        index,
+        location,
+        point(4),
+        color,
+        0.1,
+        context.scale,
+        "power_port_stem",
+      ),
+      {
+        type: "schematic_path",
+        schematic_path_id: `schematic_power_port_altium_${index}`,
+        schematic_sheet_id: SCHEMATIC_SHEET_ID,
+        points: [point(4, -7), point(4, 7), point(12)].map((value) =>
+          scalePoint(value, context.scale),
+        ),
+        stroke_width: 0.1,
+        stroke_color: color,
+        is_filled: false,
+        is_dashed: false,
+      } satisfies SchematicPath,
+    )
+    labelDistance = 16
+  } else if (style === 4) {
+    elements.push(
+      createLine(
+        index,
+        location,
+        point(4),
+        color,
+        0.1,
+        context.scale,
+        "power_port_stem",
+      ),
+      ...[
+        { along: 4, halfWidth: 7 },
+        { along: 8, halfWidth: 4.5 },
+        { along: 12, halfWidth: 2 },
+      ].map(({ along, halfWidth }, lineIndex) =>
+        createLine(
+          index,
+          point(along, -halfWidth),
+          point(along, halfWidth),
+          color,
+          0.1,
+          context.scale,
+          `power_port_ground_${lineIndex}`,
+        ),
+      ),
+    )
+    labelDistance = 16
+  } else if (style === 6) {
+    elements.push(
+      createLine(
+        index,
+        location,
+        point(4),
+        color,
+        0.1,
+        context.scale,
+        "power_port_stem",
+      ),
+      createLine(
+        index,
+        point(4, -7),
+        point(4, 7),
+        color,
+        0.1,
+        context.scale,
+        "power_port_chassis_bar",
+      ),
+      ...[
+        { from: -7, to: -9 },
+        { from: 0, to: -2 },
+        { from: 7, to: 5 },
+      ].map(({ from, to }, lineIndex) =>
+        createLine(
+          index,
+          point(4, from),
+          point(9, to),
+          color,
+          0.1,
+          context.scale,
+          `power_port_chassis_${lineIndex}`,
+        ),
+      ),
+    )
+    labelDistance = 14
+  } else {
+    elements.push({
       type: "schematic_path",
       schematic_path_id: `schematic_power_port_altium_${index}`,
       schematic_sheet_id: SCHEMATIC_SHEET_ID,
-      points: points.map((point) => scalePoint(point, context.scale)),
+      points: [location, point(10, -5), point(10, 5)].map((value) =>
+        scalePoint(value, context.scale),
+      ),
       stroke_width: 0.1,
       stroke_color: color,
       fill_color: color,
       is_filled: true,
       is_dashed: false,
-    } satisfies SchematicPath,
-  ]
+    } satisfies SchematicPath)
+    labelDistance = 14
+  }
   const text = record.getDecoded("TEXT") ?? record.getDecoded("NAME")
-  if (text && options.includeText !== false) {
+  if (
+    text &&
+    options.includeText !== false &&
+    record.getBoolean("SHOWNETNAME") !== false
+  ) {
+    const vertical = direction.y !== 0
+    const anchor: SchematicText["anchor"] = vertical
+      ? direction.y > 0
+        ? "bottom_center"
+        : "top_center"
+      : direction.x > 0
+        ? "center_left"
+        : "center_right"
     elements.push(
       createDirectText(
         `schematic_power_port_text_altium_${index}`,
         text,
-        { x: location.x + 7, y: location.y + 3 },
+        point(labelDistance),
         getFontSize(record, context),
         color,
         context.scale,
         0,
-        "left",
+        anchor,
       ),
     )
   }
@@ -479,13 +667,39 @@ function convertPort(
   const location = getLocation(record)
   if (!location) return []
   const width = Math.max(Number(record.getCaseInsensitive("WIDTH") ?? 16), 10)
-  const points = [
-    { x: location.x, y: location.y },
-    { x: location.x + width * 0.22, y: location.y + 5 },
-    { x: location.x + width, y: location.y + 5 },
-    { x: location.x + width, y: location.y - 5 },
-    { x: location.x + width * 0.22, y: location.y - 5 },
-  ]
+  const height = Math.max(Number(record.getCaseInsensitive("HEIGHT") ?? 10), 4)
+  const halfHeight = height / 2
+  const pointDepth = Math.min(width * 0.22, height)
+  const ioType = Number(record.getCaseInsensitive("IOTYPE") ?? 0)
+  const points =
+    ioType === 1
+      ? [
+          { x: location.x, y: location.y },
+          { x: location.x + pointDepth, y: location.y + halfHeight },
+          { x: location.x + width, y: location.y + halfHeight },
+          { x: location.x + width, y: location.y - halfHeight },
+          { x: location.x + pointDepth, y: location.y - halfHeight },
+        ]
+      : ioType === 2
+        ? [
+            { x: location.x, y: location.y + halfHeight },
+            {
+              x: location.x + width - pointDepth,
+              y: location.y + halfHeight,
+            },
+            { x: location.x + width, y: location.y },
+            {
+              x: location.x + width - pointDepth,
+              y: location.y - halfHeight,
+            },
+            { x: location.x, y: location.y - halfHeight },
+          ]
+        : [
+            { x: location.x, y: location.y + halfHeight },
+            { x: location.x + width, y: location.y + halfHeight },
+            { x: location.x + width, y: location.y - halfHeight },
+            { x: location.x, y: location.y - halfHeight },
+          ]
   const elements: AnyCircuitElement[] = [
     {
       type: "schematic_path",
@@ -494,7 +708,10 @@ function convertPort(
       points: points.map((point) => scalePoint(point, context.scale)),
       stroke_width: 0.1,
       stroke_color: color,
-      fill_color: "#ffffff",
+      fill_color: altiumColorToCss(
+        record.getCaseInsensitive("AREACOLOR"),
+        "#ffffff",
+      ),
       is_filled: true,
       is_dashed: false,
     } satisfies SchematicPath,
@@ -507,7 +724,7 @@ function convertPort(
         name,
         { x: location.x + width / 2, y: location.y },
         getFontSize(record, context),
-        color,
+        altiumColorToCss(record.getCaseInsensitive("TEXTCOLOR"), color),
         context.scale,
         0,
         "center",
@@ -621,6 +838,17 @@ function getFontSize(record: AltiumRecord, context: SchematicContext): number {
     Number(context.sheetRecord?.getCaseInsensitive(`SIZE${fontId}`) ?? 9),
     1,
   )
+}
+
+function getFontFamily(
+  record: AltiumRecord,
+  context: SchematicContext,
+): string {
+  const fontId = Math.max(
+    Math.round(Number(record.getCaseInsensitive("FONTID") ?? 1)),
+    1,
+  )
+  return context.sheetRecord?.getDecoded(`FONTNAME${fontId}`) ?? "Arial"
 }
 
 function getTextPositioning(record: AltiumRecord): {
@@ -758,6 +986,65 @@ function approximateEllipse(
 
 function decodeMultilineText(text: string): string {
   return text.replaceAll("~1", "\n").replaceAll("\\n", "\n")
+}
+
+function wrapSchematicText(
+  text: string,
+  maximumWidth: number,
+  fontSize: number,
+  fontFamily: string,
+): string[] {
+  return text.split("\n").flatMap((paragraph) => {
+    if (
+      estimateSchematicTextWidth(paragraph, fontSize, fontFamily) <=
+      maximumWidth
+    ) {
+      return [paragraph]
+    }
+    const words = paragraph.split(/\s+/u)
+    const lines: string[] = []
+    let line = ""
+    for (const word of words) {
+      if (!line) {
+        line = word
+      } else if (
+        estimateSchematicTextWidth(`${line} ${word}`, fontSize, fontFamily) <=
+        maximumWidth
+      ) {
+        line = `${line} ${word}`
+      } else {
+        lines.push(line)
+        line = word
+      }
+    }
+    if (line) lines.push(line)
+    return lines.length > 0 ? lines : [paragraph]
+  })
+}
+
+function estimateSchematicTextWidth(
+  text: string,
+  fontSize: number,
+  fontFamily: string,
+): number {
+  if (/courier|mono/iu.test(fontFamily)) return text.length * fontSize * 0.6
+  if (!/times|cambria|serif/iu.test(fontFamily)) {
+    return text.length * fontSize * 0.52
+  }
+
+  return [...text].reduce((width, character) => {
+    const emWidth =
+      character === " "
+        ? 0.23
+        : /[ilI1.,:;!'`|]/u.test(character)
+          ? 0.2
+          : /[mwMW@%]/u.test(character)
+            ? 0.7
+            : /[A-Z0-9]/u.test(character)
+              ? 0.5
+              : 0.4
+    return width + emWidth * fontSize
+  }, 0)
 }
 
 function altiumColorToCss(raw: string | undefined, fallback: string): string {
