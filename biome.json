@@ -6,7 +6,13 @@
     "indentStyle": "space"
   },
   "files": {
-    "includes": ["**", "!**/dist", "!**/node_modules", "!**/*.json"]
+    "includes": [
+      "**",
+      "!**/dist",
+      "!**/node_modules",
+      "!**/__snapshots__",
+      "!**/*.json"
+    ]
   },
   "javascript": {
     "formatter": {

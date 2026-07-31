@@ -1,20 +1,15 @@
 import { expect, test } from "bun:test"
-import { join } from "node:path"
 import { parseAltiumSchDoc, serializeAltiumSheetToSvg } from "altiumts"
 import { any_circuit_element } from "circuit-json"
 import { convertCircuitJsonToSchematicSvg } from "circuit-to-svg"
-import { stackSvgsHorizontally } from "stack-svgs"
 import { convertAltiumToCircuitJson } from "../../lib"
-
-const referencePath = join(
-  import.meta.dir,
-  "../fixtures/downloaded/simplefocmini-2024-04-26.SchDoc",
-)
+import { readReferenceBytes } from "../helpers/read-reference"
+import { stackAltiumAndCircuitJsonSvgs } from "../helpers/stack-svg-comparison"
 
 test(
   "SimpleFOC Mini schematic: altiumts SVG on the left, Circuit JSON SVG on the right",
   async () => {
-    const source = new Uint8Array(await Bun.file(referencePath).arrayBuffer())
+    const source = await readReferenceBytes("simplefocmini-2024-04-26.SchDoc")
     const document = parseAltiumSchDoc(source)
     const circuitJson = convertAltiumToCircuitJson(source, {
       sourceType: "schematic",
@@ -43,15 +38,11 @@ test(
       width: 800,
     })
     const circuitJsonSvg = convertCircuitJsonToSchematicSvg(circuitJson)
-    const comparisonSvg = stackSvgsHorizontally([altiumSvg, circuitJsonSvg], {
-      gap: 24,
-      normalizeSize: true,
-      targetSize: 800,
-      rootAttributes: {
-        "aria-label": "altiumts source on left, Circuit JSON on right",
-        role: "img",
-      },
-    })
+    const comparisonSvg = stackAltiumAndCircuitJsonSvgs(
+      altiumSvg,
+      circuitJsonSvg,
+      "SimpleFOC Mini schematic",
+    )
 
     await expect(comparisonSvg).toMatchSvgSnapshot(import.meta.path)
   },

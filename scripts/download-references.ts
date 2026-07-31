@@ -1,43 +1,138 @@
 import { createHash } from "node:crypto"
-import { mkdir } from "node:fs/promises"
-import { join } from "node:path"
+import { mkdir, readFile, writeFile } from "node:fs/promises"
+import { dirname, resolve } from "node:path"
+import { unzipSync } from "fflate"
+import {
+  DIRECT_REFERENCES,
+  type DirectReferenceSpec,
+  NESTED_ZIP_BUNDLES,
+  type NestedZipBundleSpec,
+  REFERENCE_OUTPUT_DIRECTORY,
+} from "./references/reference-manifest"
 
-const references = [
-  {
-    filename: "simplefocmini-2024-04-26.PcbDoc",
-    sha256: "8328cebe97ba8623fb2b707490e3473c6f7dc13fb0502b596b0e40c7e1613d24",
-    url: "https://raw.githubusercontent.com/simplefoc/SimpleFOCMini/8e10d4ba398624bd0ef970e82c03d7a6bcc2220d/Altium/simplefocmini_2024-04-26.pcbdoc",
-  },
-  {
-    filename: "sample-board-design.PcbDoc",
-    sha256: "745a27e3b876767c9bc4caf7706c19b6f97b3313efdb00bc2771f22db8410174",
-    url: "https://raw.githubusercontent.com/monkslc/hyperpolyglot/a55a3b58eaed09b4314ef93d78e50a80cfec36f4/samples/Altium%20Designer/Sample%20Board%20Design.PcbDoc",
-  },
-  {
-    filename: "simplefocmini-2024-04-26.SchDoc",
-    sha256: "bc2039ef59eabe030fea68eedb87e3924c8e6711fb774e2d80b880cf468100ef",
-    url: "https://raw.githubusercontent.com/simplefoc/SimpleFOCMini/8e10d4ba398624bd0ef970e82c03d7a6bcc2220d/Altium/simplefocmini_2024-04-26.schdoc",
-  },
-] as const
-const outputDirectory = join(import.meta.dir, "../tests/fixtures/downloaded")
-
-await mkdir(outputDirectory, { recursive: true })
-
-for (const reference of references) {
-  const response = await fetch(reference.url)
-  if (!response.ok) {
-    throw new Error(
-      `Unable to download ${reference.filename}: ${response.status} ${response.statusText}`,
-    )
+async function downloadDirectReference(
+  reference: DirectReferenceSpec,
+): Promise<void> {
+  if (await hasExpectedHash(reference.filename, reference.sha256)) {
+    console.log(`Using cached ${reference.filename}`)
+    return
   }
-  const bytes = new Uint8Array(await response.arrayBuffer())
-  const actualHash = createHash("sha256").update(bytes).digest("hex")
-  if (actualHash !== reference.sha256) {
-    throw new Error(
-      `${reference.filename} SHA-256 mismatch: expected ${reference.sha256}, got ${actualHash}`,
-    )
-  }
-  const outputPath = join(outputDirectory, reference.filename)
-  await Bun.write(outputPath, bytes)
-  console.log(`Downloaded ${reference.filename}`)
+
+  const bytes = await fetchBytes(reference.url)
+  verifySha256(reference.filename, bytes, reference.sha256)
+  await writeReference(reference.filename, bytes)
+  console.log(
+    `Saved ${reference.filename} (${bytes.byteLength} bytes) from ${reference.source}`,
+  )
 }
+
+async function downloadNestedZipBundle(
+  reference: NestedZipBundleSpec,
+): Promise<void> {
+  const cachedResults = await Promise.all(
+    reference.outputs.map((output) =>
+      hasExpectedHash(output.filename, output.sha256),
+    ),
+  )
+  if (cachedResults.every(Boolean)) {
+    console.log(`Using cached ${reference.source}`)
+    return
+  }
+
+  const archiveBytes = await fetchBytes(reference.url)
+  verifySha256(
+    `${reference.source} outer archive`,
+    archiveBytes,
+    reference.archiveSha256,
+  )
+  const nestedArchive = getExtractedEntry(
+    unzipSync(archiveBytes, {
+      filter: ({ name }) => name === reference.nestedArchivePath,
+    }),
+    reference.nestedArchivePath,
+  )
+  verifySha256(
+    `${reference.source} nested archive`,
+    nestedArchive,
+    reference.nestedArchiveSha256,
+  )
+
+  const expectedPaths = new Set(
+    reference.outputs.map((output) => output.nestedFilePath),
+  )
+  const entries = unzipSync(nestedArchive, {
+    filter: ({ name }) => expectedPaths.has(name),
+  })
+  for (const output of reference.outputs) {
+    const bytes = getExtractedEntry(entries, output.nestedFilePath)
+    verifySha256(output.filename, bytes, output.sha256)
+    await writeReference(output.filename, bytes)
+    console.log(`Saved ${output.filename} (${bytes.byteLength} bytes)`)
+  }
+}
+
+async function fetchBytes(url: string): Promise<Uint8Array> {
+  const response = await fetch(url)
+  if (!response.ok) {
+    throw new Error(`${url} (${response.status} ${response.statusText})`)
+  }
+  return new Uint8Array(await response.arrayBuffer())
+}
+
+async function hasExpectedHash(
+  filename: string,
+  expectedHash: string,
+): Promise<boolean> {
+  try {
+    const bytes = new Uint8Array(
+      await readFile(resolve(REFERENCE_OUTPUT_DIRECTORY, filename)),
+    )
+    return getSha256(bytes) === expectedHash
+  } catch (error) {
+    if (error instanceof Error && "code" in error && error.code === "ENOENT") {
+      return false
+    }
+    throw error
+  }
+}
+
+async function writeReference(
+  filename: string,
+  bytes: Uint8Array,
+): Promise<void> {
+  const outputPath = resolve(REFERENCE_OUTPUT_DIRECTORY, filename)
+  await mkdir(dirname(outputPath), { recursive: true })
+  await writeFile(outputPath, bytes)
+}
+
+function getExtractedEntry(
+  entries: Record<string, Uint8Array>,
+  expectedPath: string,
+): Uint8Array {
+  const entry = entries[expectedPath]
+  if (!entry) throw new Error(`ZIP archive does not contain ${expectedPath}`)
+  return entry
+}
+
+function getSha256(bytes: Uint8Array): string {
+  return createHash("sha256").update(bytes).digest("hex")
+}
+
+function verifySha256(
+  label: string,
+  bytes: Uint8Array,
+  expectedHash: string,
+): void {
+  const actualHash = getSha256(bytes)
+  if (actualHash !== expectedHash) {
+    throw new Error(
+      `${label} SHA-256 mismatch: expected ${expectedHash}, got ${actualHash}`,
+    )
+  }
+}
+
+await mkdir(REFERENCE_OUTPUT_DIRECTORY, { recursive: true })
+await Promise.all([
+  ...DIRECT_REFERENCES.map(downloadDirectReference),
+  ...NESTED_ZIP_BUNDLES.map(downloadNestedZipBundle),
+])
