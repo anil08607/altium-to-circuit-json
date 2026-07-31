@@ -54,13 +54,22 @@ PCB conversion currently emits:
 Schematic conversion currently emits:
 
 - sheet identity and border geometry;
-- wires as schematic traces;
+- typed source components, source ports, source nets, and source traces;
+- standard Circuit JSON resistor, capacitor, inductor, diode, LED, test-point,
+  power, and ground symbols;
+- box-with-pins schematic components with named and numbered schematic ports
+  for chips, connectors, and other multi-pin parts;
+- wires as schematic traces, including mid-segment labels, pin terminals,
+  T-junctions, and explicit junctions;
 - polylines, polygons, rectangles, circles, ellipses, and arcs;
-- pins, junctions, no-ERC markers, ports, and power ports;
+- no-ERC markers, hierarchical ports, and power ports;
 - labels, net labels, designators, parameters, and text frames; and
-- active multipart/display-mode filtering plus Altium text orientation and anchoring.
+- active multipart/display-mode filtering, with multiple placed symbol parts
+  sharing one physical source component.
 
-The package is intentionally an incremental converter. Connectivity source elements, complete component semantics, copper pours/regions, mechanical/dimension primitives, models, and project-level hierarchy remain follow-up areas.
+The package is intentionally an incremental converter. Complete component
+classification, copper pours/regions, mechanical/dimension primitives, models,
+and project-level hierarchy remain follow-up areas.
 
 ## Visual tests
 

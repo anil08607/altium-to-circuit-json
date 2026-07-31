@@ -15,6 +15,7 @@ import type {
   SchematicText,
   SchematicTrace,
 } from "circuit-json"
+import { convertSemanticSchematic } from "./schematic/convert-semantic-schematic"
 
 const DEFAULT_SCHEMATIC_UNIT_SCALE = 0.1
 const SCHEMATIC_SHEET_ID = "schematic_sheet_altium"
@@ -59,7 +60,16 @@ export function convertAltiumSchDocToCircuitJson(
     elements.push(createSheetBorder(sheetRecord, scale))
   }
 
+  const semanticConversion = convertSemanticSchematic(document, {
+    includeHidden: options.includeHidden,
+    includeText: options.includeText,
+    scale,
+    schematicSheetId: SCHEMATIC_SHEET_ID,
+  })
+  elements.push(...semanticConversion.elements)
+
   for (const [index, record] of records.entries()) {
+    if (semanticConversion.handledRecords.has(record)) continue
     if (!shouldRenderSchematicRecord(record, context)) continue
     const converted = convertSchematicRecord(record, index, context, options)
     elements.push(...converted)
