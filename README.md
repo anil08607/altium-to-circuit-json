@@ -78,6 +78,19 @@ bun run test:update-svg
 
 Every imported reference used by the test suite has a side-by-side SVG snapshot. The committed fixtures are generated from pinned upstream URLs and are not stored in this repository.
 
+The TI SPRCAL9 / TMDS62LEVM Rev. B regression corpus includes all 57
+schematic sheets and a top-copper PCB comparison. Its large downloaded source
+files are checksum-verified and cached in CI. To also write the complete
+converted Circuit JSON artifacts locally, run:
+
+```sh
+bun run convert:ti-reference
+```
+
+This creates `artifacts/ti-tmds62levm-rev-b/pcb.circuit.json`, one Circuit JSON
+file per schematic sheet, and a conversion manifest. The artifact directory is
+gitignored; the compact SVG regression snapshots remain committed.
+
 ## Development
 
 ```sh

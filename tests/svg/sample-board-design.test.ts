@@ -1,20 +1,15 @@
 import { expect, test } from "bun:test"
-import { join } from "node:path"
 import { parseAltiumPcbDoc, serializeAltiumPcbToSvg } from "altiumts"
 import { any_circuit_element } from "circuit-json"
 import { convertCircuitJsonToPcbSvg } from "circuit-to-svg"
-import { stackSvgsHorizontally } from "stack-svgs"
 import { convertAltiumToCircuitJson } from "../../lib"
-
-const referencePath = join(
-  import.meta.dir,
-  "../fixtures/downloaded/sample-board-design.PcbDoc",
-)
+import { readReferenceText } from "../helpers/read-reference"
+import { stackAltiumAndCircuitJsonSvgs } from "../helpers/stack-svg-comparison"
 
 test(
   "sample board: altiumts SVG on the left, Circuit JSON SVG on the right",
   async () => {
-    const source = await Bun.file(referencePath).text()
+    const source = await readReferenceText("sample-board-design.PcbDoc")
     const document = parseAltiumPcbDoc(source)
     const circuitJson = convertAltiumToCircuitJson(source, {
       sourceType: "pcb",
@@ -57,15 +52,11 @@ test(
     const circuitJsonSvg = convertCircuitJsonToPcbSvg(circuitJson, {
       matchBoardAspectRatio: true,
     })
-    const comparisonSvg = stackSvgsHorizontally([altiumSvg, circuitJsonSvg], {
-      gap: 24,
-      normalizeSize: true,
-      targetSize: 800,
-      rootAttributes: {
-        "aria-label": "altiumts source on left, Circuit JSON on right",
-        role: "img",
-      },
-    })
+    const comparisonSvg = stackAltiumAndCircuitJsonSvgs(
+      altiumSvg,
+      circuitJsonSvg,
+      "sample board",
+    )
 
     await expect(comparisonSvg).toMatchSvgSnapshot(import.meta.path)
   },
