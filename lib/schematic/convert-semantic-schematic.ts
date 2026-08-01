@@ -17,9 +17,12 @@ import {
   type SourcePort,
   type SourceTrace,
   source_simple_capacitor,
+  source_simple_crystal,
   source_simple_inductor,
+  source_simple_mosfet,
   source_simple_resistor,
 } from "circuit-json"
+import { parseAndConvertSiUnit } from "format-si-unit"
 import { type SchSymbol, symbols } from "schematic-symbols"
 
 export interface SemanticSchematicOptions {
@@ -95,6 +98,7 @@ const CARDINAL_DIRECTIONS: readonly CardinalDirection[] = [
 ]
 
 const SYMBOL_CATALOG = symbols as Record<string, SchSymbol | undefined>
+const SYMBOL_NAMES = Object.keys(SYMBOL_CATALOG)
 
 /**
  * Converts records that have native Circuit JSON semantics before the
@@ -201,6 +205,7 @@ function convertComponents(params: {
           designator,
           libraryReference,
           manufacturerPartNumber,
+          pinCount: pins.length,
           sourceComponentId,
           value,
         }),
@@ -371,6 +376,7 @@ function createSourceComponent(params: {
   designator: string
   libraryReference: string
   manufacturerPartNumber?: string
+  pinCount: number
   sourceComponentId: string
   value: string
 }): AnyCircuitElement {
@@ -378,10 +384,12 @@ function createSourceComponent(params: {
     designator,
     libraryReference,
     manufacturerPartNumber,
+    pinCount,
     sourceComponentId,
     value,
   } = params
   const classification = classifyComponent({ designator, libraryReference })
+  const primaryValue = getPrimaryComponentValue(value)
   const common = {
     type: "source_component" as const,
     display_name: designator,
@@ -396,7 +404,7 @@ function createSourceComponent(params: {
       ...common,
       display_resistance: value || undefined,
       ftype: "simple_resistor",
-      resistance: value || 0,
+      resistance: primaryValue || 0,
     })
     if (parsed.success) return parsed.data
   }
@@ -405,7 +413,7 @@ function createSourceComponent(params: {
       ...common,
       display_capacitance: value || undefined,
       ftype: "simple_capacitor",
-      capacitance: value || 0,
+      capacitance: primaryValue || 0,
     })
     if (parsed.success) return parsed.data
   }
@@ -414,7 +422,27 @@ function createSourceComponent(params: {
       ...common,
       display_inductance: value || undefined,
       ftype: "simple_inductor",
-      inductance: value || 0,
+      inductance: primaryValue || 0,
+    })
+    if (parsed.success) return parsed.data
+  }
+  if (classification === "crystal" && (pinCount === 2 || pinCount === 4)) {
+    const frequency = parseAndConvertSiUnit(value, "Hz").value
+    if (typeof frequency === "number" && Number.isFinite(frequency)) {
+      const parsed = source_simple_crystal.safeParse({
+        ...common,
+        frequency,
+        ftype: "simple_crystal",
+        pin_variant: pinCount === 4 ? "four_pin" : "two_pin",
+      })
+      if (parsed.success) return parsed.data
+    }
+  }
+  if (classification === "mosfet" && pinCount === 3) {
+    const parsed = source_simple_mosfet.safeParse({
+      ...common,
+      ...getMosfetVariant(libraryReference),
+      ftype: "simple_mosfet",
     })
     if (parsed.success) return parsed.data
   }
@@ -841,14 +869,7 @@ function convertConnectivity(params: {
       const portRecordIndex = document.records.indexOf(convertedPort.record)
       elements.push({
         type: "schematic_trace",
-        edges: [
-          {
-            from: convertedPort.schematicPort.center,
-            from_schematic_port_id:
-              convertedPort.schematicPort.schematic_port_id,
-            to: electricalTerminal,
-          },
-        ],
+        edges: createPortLeadEdges(convertedPort, electricalTerminal),
         junctions: [],
         schematic_sheet_id: options.schematicSheetId,
         schematic_trace_id: `schematic_trace_altium_port_lead_${portRecordIndex}`,
@@ -869,6 +890,40 @@ function convertConnectivity(params: {
     sourceNetIdByName,
     sourceNetIdByRecord,
   }
+}
+
+function createPortLeadEdges(
+  convertedPort: ConvertedPort,
+  electricalTerminal: AltiumPoint,
+): SchematicTrace["edges"] {
+  const portCenter = convertedPort.schematicPort.center
+  const facingDirection =
+    convertedPort.schematicPort.facing_direction ?? "right"
+  const elbow =
+    facingDirection === "left" || facingDirection === "right"
+      ? { x: electricalTerminal.x, y: portCenter.y }
+      : { x: portCenter.x, y: electricalTerminal.y }
+  const points = [portCenter, elbow, electricalTerminal].filter(
+    (point, index, allPoints) =>
+      index === 0 || !pointsEqual(point, allPoints[index - 1]),
+  )
+
+  return points.slice(1).flatMap((to, index) => {
+    const from = points[index]
+    if (!from) return []
+    return [
+      {
+        from,
+        ...(index === 0
+          ? {
+              from_schematic_port_id:
+                convertedPort.schematicPort.schematic_port_id,
+            }
+          : {}),
+        to,
+      },
+    ]
+  })
 }
 
 function convertNetLabels(params: {
@@ -986,14 +1041,29 @@ function selectCircuitJsonSymbol(params: {
   const { designator, libraryReference, ports } = params
   const classification = classifyComponent({ designator, libraryReference })
   let baseName: string | undefined
+  let candidateNames: string[] = []
   if (classification === "testpoint" && ports.length === 1) {
     baseName = "testpoint"
+  } else if (classification === "crystal" && ports.length === 2) {
+    baseName = "crystal"
+  } else if (classification === "crystal" && ports.length === 4) {
+    baseName = "crystal_4pin"
+  } else if (classification === "mosfet" && ports.length === 3) {
+    const { channel_type, mosfet_mode } = getMosfetVariant(libraryReference)
+    const channel = channel_type === "p" ? "p" : "n"
+    const mode = mosfet_mode === "depletion" ? "d" : "e"
+    const prefix = `${channel}_channel_${mode}_mosfet_transistor_gate_`
+    candidateNames = SYMBOL_NAMES.filter((name) => name.startsWith(prefix))
   } else if (ports.length !== 2) {
     return undefined
   } else if (classification === "resistor") {
     baseName = "boxresistor"
   } else if (classification === "capacitor") {
-    baseName = "capacitor"
+    baseName = isPolarizedCapacitor(libraryReference)
+      ? "capacitor_polarized"
+      : "capacitor"
+  } else if (classification === "ferrite_bead") {
+    baseName = "ferrite_bead"
   } else if (classification === "inductor") {
     baseName = "inductor"
   } else if (classification === "led") {
@@ -1003,13 +1073,22 @@ function selectCircuitJsonSymbol(params: {
     const lower = libraryReference.toLowerCase()
     baseName = lower.includes("schottky") ? "schottky_diode" : "diode"
   }
-  if (!baseName) return undefined
+  if (baseName) {
+    candidateNames = CARDINAL_DIRECTIONS.map(
+      (direction) => `${baseName}_${direction}`,
+    )
+  }
+  if (candidateNames.length === 0) return undefined
 
-  const selections = CARDINAL_DIRECTIONS.flatMap((direction) => {
-    const name = `${baseName}_${direction}`
+  const selections = candidateNames.flatMap((name) => {
     const symbol = SYMBOL_CATALOG[name]
     if (!symbol || symbol.ports.length !== ports.length) return []
-    const assignments = assignConvertedPortsToSymbolPorts(ports, symbol)
+    const assignments = assignConvertedPortsToSymbolPorts(ports, symbol, {
+      geometryInterchangeableLabels:
+        classification === "crystal" && ports.length === 4
+          ? new Set(["2", "4"])
+          : undefined,
+    })
     return assignments.length === ports.length
       ? [{ assignments, name, symbol } satisfies SymbolSelection]
       : []
@@ -1023,31 +1102,77 @@ function selectCircuitJsonSymbol(params: {
 function assignConvertedPortsToSymbolPorts(
   ports: ConvertedPort[],
   symbol: SchSymbol,
+  options: { geometryInterchangeableLabels?: Set<string> } = {},
 ): SymbolPortAssignment[] {
   const unusedSymbolPorts = new Set(symbol.ports)
   const orderedPorts = [...ports].sort(compareConvertedPorts)
   const assignments: SymbolPortAssignment[] = []
+  const convertedCenter = getAveragePoint(ports.map(({ point }) => point))
 
   for (const [portIndex, convertedPort] of orderedPorts.entries()) {
-    const hints = new Set(
-      [
-        convertedPort.schematicPort.pin_number?.toString(),
-        convertedPort.sourcePort.name,
-        ...(convertedPort.sourcePort.port_hints ?? []),
-      ]
-        .filter((hint): hint is string => Boolean(hint))
-        .map((hint) => hint.toLowerCase()),
+    const rawHints = [
+      convertedPort.schematicPort.pin_number?.toString(),
+      convertedPort.sourcePort.name,
+      ...(convertedPort.sourcePort.port_hints ?? []),
+    ].filter((hint): hint is string => Boolean(hint))
+    const functionalHints = new Set(
+      rawHints.flatMap((hint) => {
+        const normalized = normalizeFunctionalPortLabel(hint)
+        return normalized ? [normalized] : []
+      }),
     )
-    const matchingSymbolPort = [...unusedSymbolPorts].find((symbolPort) =>
-      symbolPort.labels.some((label) => hints.has(label.toLowerCase())),
+    const functionalSymbolPort = [...unusedSymbolPorts].find((symbolPort) =>
+      symbolPort.labels.some((label) => {
+        const normalized = normalizeFunctionalPortLabel(label)
+        return normalized ? functionalHints.has(normalized) : false
+      }),
     )
+    const exactHints = new Set(rawHints.map((hint) => hint.toLowerCase()))
+    const exactSymbolPort = [...unusedSymbolPorts].find((symbolPort) =>
+      symbolPort.labels.some((label) => exactHints.has(label.toLowerCase())),
+    )
+    const interchangeableLabels = options.geometryInterchangeableLabels
+    const isGeometryInterchangeable = rawHints.some((hint) =>
+      interchangeableLabels?.has(hint.toLowerCase()),
+    )
+    const geometrySymbolPort = isGeometryInterchangeable
+      ? [...unusedSymbolPorts]
+          .filter((symbolPort) =>
+            symbolPort.labels.some((label) =>
+              interchangeableLabels?.has(label.toLowerCase()),
+            ),
+          )
+          .sort(
+            (left, right) =>
+              getVectorDifference(
+                subtractPoints(convertedPort.point, convertedCenter),
+                subtractPoints(left, symbol.center),
+              ) -
+              getVectorDifference(
+                subtractPoints(convertedPort.point, convertedCenter),
+                subtractPoints(right, symbol.center),
+              ),
+          )[0]
+      : undefined
     const symbolPort =
-      matchingSymbolPort ?? symbol.ports[portIndex] ?? [...unusedSymbolPorts][0]
+      functionalSymbolPort ??
+      geometrySymbolPort ??
+      exactSymbolPort ??
+      symbol.ports[portIndex] ??
+      [...unusedSymbolPorts][0]
     if (!symbolPort) continue
     unusedSymbolPorts.delete(symbolPort)
     assignments.push({ convertedPort, symbolPort })
   }
   return assignments
+}
+
+function getAveragePoint(points: AltiumPoint[]): AltiumPoint {
+  if (points.length === 0) return { x: 0, y: 0 }
+  return {
+    x: points.reduce((sum, point) => sum + point.x, 0) / points.length,
+    y: points.reduce((sum, point) => sum + point.y, 0) / points.length,
+  }
 }
 
 function compareConvertedPorts(
@@ -1078,10 +1203,44 @@ function getSymbolDirectionScore(selection: SymbolSelection): number {
       subtractPoints(first.symbolPort, selection.symbol.center),
     )
   }
-  return getVectorDifference(
-    subtractPoints(second.convertedPort.point, first.convertedPort.point),
-    subtractPoints(second.symbolPort, first.symbolPort),
-  )
+  let difference = 0
+  let comparisonCount = 0
+  for (
+    let firstIndex = 0;
+    firstIndex < selection.assignments.length;
+    firstIndex++
+  ) {
+    for (
+      let secondIndex = firstIndex + 1;
+      secondIndex < selection.assignments.length;
+      secondIndex++
+    ) {
+      const firstAssignment = selection.assignments[firstIndex]
+      const secondAssignment = selection.assignments[secondIndex]
+      if (!firstAssignment || !secondAssignment) continue
+      const pairDifference = getVectorDifference(
+        subtractPoints(
+          secondAssignment.convertedPort.point,
+          firstAssignment.convertedPort.point,
+        ),
+        subtractPoints(secondAssignment.symbolPort, firstAssignment.symbolPort),
+      )
+      if (!Number.isFinite(pairDifference)) continue
+      difference += pairDifference
+      comparisonCount++
+    }
+  }
+  return comparisonCount > 0
+    ? difference / comparisonCount
+    : Number.POSITIVE_INFINITY
+}
+
+function normalizeFunctionalPortLabel(value: string): string | undefined {
+  const normalized = value.toLowerCase().replace(/[^a-z]/gu, "")
+  if (normalized === "g" || normalized === "gate") return "gate"
+  if (normalized === "d" || normalized === "drain") return "drain"
+  if (normalized === "s" || normalized === "source") return "source"
+  return undefined
 }
 
 function getVectorDifference(left: AltiumPoint, right: AltiumPoint): number {
@@ -1135,9 +1294,12 @@ function classifyComponent(params: {
   libraryReference: string
 }):
   | "capacitor"
+  | "crystal"
   | "diode"
+  | "ferrite_bead"
   | "inductor"
   | "led"
+  | "mosfet"
   | "resistor"
   | "testpoint"
   | "unknown" {
@@ -1147,6 +1309,22 @@ function classifyComponent(params: {
   if (prefix === "TP" || lowerReference.includes("testpoint")) {
     return "testpoint"
   }
+  if (
+    prefix === "Y" ||
+    lowerReference.includes("crystal") ||
+    /(?:^|[_-])cry(?:\d|[_-]|$)/iu.test(libraryReference)
+  ) {
+    return "crystal"
+  }
+  if (lowerReference.includes("mosfet")) return "mosfet"
+  if (
+    prefix === "FB" ||
+    prefix === "FL" ||
+    lowerReference.includes("ferrite") ||
+    lowerReference.includes("emifilter_ind")
+  ) {
+    return "ferrite_bead"
+  }
   if (prefix === "LED" || lowerReference.includes("led")) return "led"
   if (prefix === "R" || lowerReference.includes("resistor")) return "resistor"
   if (prefix === "C" || /(?:^|[_-])cap(?:[_-]|$)/iu.test(libraryReference)) {
@@ -1155,6 +1333,33 @@ function classifyComponent(params: {
   if (prefix === "L" || lowerReference.includes("inductor")) return "inductor"
   if (prefix === "D" || lowerReference.includes("diode")) return "diode"
   return "unknown"
+}
+
+function getMosfetVariant(libraryReference: string): {
+  channel_type: "n" | "p"
+  mosfet_mode: "depletion" | "enhancement"
+} {
+  const lowerReference = libraryReference.toLowerCase()
+  const isPChannel =
+    /(?:^|[_-])p(?:channel)?(?:[_-]|$)/iu.test(libraryReference) ||
+    lowerReference.includes("pmos") ||
+    lowerReference.includes("csd25")
+  return {
+    channel_type: isPChannel ? "p" : "n",
+    mosfet_mode: lowerReference.includes("depletion")
+      ? "depletion"
+      : "enhancement",
+  }
+}
+
+function isPolarizedCapacitor(libraryReference: string): boolean {
+  return /(?:^|[_-])cap(?:acitor)?[_-]?pol(?:arized)?(?:[_-]|$)/iu.test(
+    libraryReference,
+  )
+}
+
+function getPrimaryComponentValue(value: string): string {
+  return value.split(/[_/\s]+/u).find(Boolean) ?? value
 }
 
 function getPowerPortSymbolName(
