@@ -40,6 +40,9 @@ for (const sheetNumber of TI_TMDS62LEVM_SCHEMATIC_SHEET_NUMBERS) {
         width: 800,
       })
       const circuitJsonSvg = renderImportedSchematicToSvg(circuitJson)
+      expect(circuitJsonSvg).toContain(
+        'data-circuit-json-type="schematic_sheet"',
+      )
       expect(circuitJsonSvg).not.toContain("Could not match ports")
       expect(circuitJsonSvg).not.toContain("Symbol not found")
       expect(circuitJsonSvg).not.toContain("NaN")

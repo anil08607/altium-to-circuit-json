@@ -53,7 +53,8 @@ PCB conversion currently emits:
 
 Schematic conversion currently emits:
 
-- sheet identity and border geometry;
+- a Circuit JSON `schematic_sheet`, with imported geometry page-fitted and
+  centered inside its standard A4 drawing area;
 - typed source components, source ports, source nets, and source traces;
 - standard Circuit JSON resistor, capacitor, inductor, diode, LED, test-point,
   power, and ground symbols;
@@ -66,6 +67,12 @@ Schematic conversion currently emits:
 - labels, net labels, designators, parameters, and text frames; and
 - active multipart/display-mode filtering, with multiple placed symbol parts
   sharing one physical source component.
+
+By default, schematic coordinates are scaled from the Altium page dimensions
+and centered on the emitted `schematic_sheet`. Set `schematicUnitScale` to use
+an explicit coordinate scale, or `centerOnSchematicSheet: false` to preserve an
+Altium-style origin. The old plain rectangular page outline remains available
+as an opt-in compatibility overlay with `includeSheetBorder: true`.
 
 The package is intentionally an incremental converter. Complete component
 classification, copper pours/regions, mechanical/dimension primitives, models,
