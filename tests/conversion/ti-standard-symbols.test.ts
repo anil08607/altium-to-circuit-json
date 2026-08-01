@@ -22,6 +22,8 @@ async function convertTiSheet(
     `${TI_TMDS62LEVM_FIXTURE_NAME}/${sheetNumber}.SchDoc`,
   )
   return convertAltiumSchDocToCircuitJson(parseAltiumSchDoc(source), {
+    centerOnSchematicSheet: false,
+    schematicUnitScale: 0.1,
     sheetName: `TI TMDS62LEVM Rev. B — sheet ${sheetNumber}`,
   })
 }

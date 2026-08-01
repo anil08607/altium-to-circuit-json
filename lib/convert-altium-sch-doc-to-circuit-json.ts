@@ -6,6 +6,7 @@ import {
 } from "altiumts"
 import type {
   AnyCircuitElement,
+  Point,
   SchematicArc,
   SchematicCircle,
   SchematicLine,
@@ -17,10 +18,20 @@ import type {
 } from "circuit-json"
 import { convertSemanticSchematic } from "./schematic/convert-semantic-schematic"
 
-const DEFAULT_SCHEMATIC_UNIT_SCALE = 0.1
 const SCHEMATIC_SHEET_ID = "schematic_sheet_altium"
+// circuit-to-svg renders schematic_sheet as a centered A4 page. Keep imported
+// coordinates inside the same 5 mm inset used by that renderer.
+const SCHEMATIC_UNIT_TO_MILLIMETERS = 10.16 / 1.1
+const SCHEMATIC_SHEET_INSET = 5 / SCHEMATIC_UNIT_TO_MILLIMETERS
+const SCHEMATIC_SHEET_WIDTH = 297 / SCHEMATIC_UNIT_TO_MILLIMETERS
+const SCHEMATIC_SHEET_HEIGHT = 210 / SCHEMATIC_UNIT_TO_MILLIMETERS
+const SCHEMATIC_SHEET_INNER_WIDTH =
+  SCHEMATIC_SHEET_WIDTH - SCHEMATIC_SHEET_INSET * 2
+const SCHEMATIC_SHEET_INNER_HEIGHT =
+  SCHEMATIC_SHEET_HEIGHT - SCHEMATIC_SHEET_INSET * 2
 
 export interface ConvertAltiumSchDocOptions {
+  centerOnSchematicSheet?: boolean
   includeHidden?: boolean
   includeSheetBorder?: boolean
   includeText?: boolean
@@ -39,24 +50,26 @@ export function convertAltiumSchDocToCircuitJson(
   document: AltiumSchDoc,
   options: ConvertAltiumSchDocOptions = {},
 ): AnyCircuitElement[] {
-  const scale = options.schematicUnitScale ?? DEFAULT_SCHEMATIC_UNIT_SCALE
+  const records = document.records
+  const sheetRecord = records.find((record) => record.recordKind === "31")
+  const sheetDimensions = getAltiumSheetDimensions(sheetRecord)
+  const scale = options.schematicUnitScale ?? getPageFitScale(sheetDimensions)
   if (!Number.isFinite(scale) || scale <= 0) {
     throw new RangeError("schematicUnitScale must be a positive finite number")
   }
 
-  const records = document.records
-  const sheetRecord = records.find((record) => record.recordKind === "31")
   const context: SchematicContext = { document, records, scale, sheetRecord }
   const elements: AnyCircuitElement[] = [
     {
       type: "schematic_sheet",
       schematic_sheet_id: SCHEMATIC_SHEET_ID,
       name: options.sheetName ?? "Altium schematic",
+      outline_color: "#334155",
       sheet_index: 0,
     } satisfies SchematicSheet,
   ]
 
-  if (options.includeSheetBorder !== false) {
+  if (options.includeSheetBorder === true) {
     elements.push(createSheetBorder(sheetRecord, scale))
   }
 
@@ -75,7 +88,96 @@ export function convertAltiumSchDocToCircuitJson(
     elements.push(...converted)
   }
 
-  return elements
+  if (options.centerOnSchematicSheet === false) return elements
+
+  const offset = {
+    x: (-sheetDimensions.width * scale) / 2,
+    y: (-sheetDimensions.height * scale) / 2,
+  }
+  return elements.map((element) => translateSchematicElement(element, offset))
+}
+
+interface SheetDimensions {
+  height: number
+  width: number
+}
+
+function getAltiumSheetDimensions(
+  sheetRecord: AltiumRecord | undefined,
+): SheetDimensions {
+  return {
+    width: getPositiveNumber(sheetRecord?.getCaseInsensitive("CUSTOMX"), 1000),
+    height: getPositiveNumber(sheetRecord?.getCaseInsensitive("CUSTOMY"), 800),
+  }
+}
+
+function getPositiveNumber(value: unknown, fallback: number): number {
+  const parsed = Number(value)
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback
+}
+
+function getPageFitScale(sheetDimensions: SheetDimensions): number {
+  return Math.min(
+    SCHEMATIC_SHEET_INNER_WIDTH / sheetDimensions.width,
+    SCHEMATIC_SHEET_INNER_HEIGHT / sheetDimensions.height,
+  )
+}
+
+function translatePoint(point: Point, offset: Point): Point {
+  return { x: point.x + offset.x, y: point.y + offset.y }
+}
+
+function translateSchematicElement(
+  element: AnyCircuitElement,
+  offset: Point,
+): AnyCircuitElement {
+  switch (element.type) {
+    case "schematic_component":
+    case "schematic_port":
+    case "schematic_rect":
+    case "schematic_circle":
+    case "schematic_arc":
+      return { ...element, center: translatePoint(element.center, offset) }
+    case "schematic_net_label":
+      return {
+        ...element,
+        center: translatePoint(element.center, offset),
+        ...(element.anchor_position
+          ? {
+              anchor_position: translatePoint(element.anchor_position, offset),
+            }
+          : {}),
+      }
+    case "schematic_text":
+      return { ...element, position: translatePoint(element.position, offset) }
+    case "schematic_path":
+      return {
+        ...element,
+        points: element.points.map((point) => translatePoint(point, offset)),
+      }
+    case "schematic_line":
+      return {
+        ...element,
+        x1: element.x1 + offset.x,
+        x2: element.x2 + offset.x,
+        y1: element.y1 + offset.y,
+        y2: element.y2 + offset.y,
+      }
+    case "schematic_trace":
+      return {
+        ...element,
+        edges: element.edges.map((edge) => ({
+          ...edge,
+          from: translatePoint(edge.from, offset),
+          to: translatePoint(edge.to, offset),
+        })),
+        junctions: element.junctions.map((junction) =>
+          translatePoint(junction, offset),
+        ),
+      }
+    default:
+      return element
+  }
 }
 
 function convertSchematicRecord(
@@ -268,14 +370,17 @@ function convertSchematicRecord(
   if (kind === "22") {
     const location = getLocation(record)
     if (!location) return []
-    const radius = 0.4 / scale
+    // altiumts renders the "Small Cross" no-ERC symbol with four Altium
+    // coordinate units on either side of its anchor.
+    const radius = 4
+    const noErcStrokeWidth = Math.max(scale, 0.02)
     return [
       createLine(
         index,
         { x: location.x - radius, y: location.y - radius },
         { x: location.x + radius, y: location.y + radius },
         color,
-        0.1,
+        noErcStrokeWidth,
         scale,
         "a",
       ),
@@ -284,7 +389,7 @@ function convertSchematicRecord(
         { x: location.x + radius, y: location.y - radius },
         { x: location.x - radius, y: location.y + radius },
         color,
-        0.1,
+        noErcStrokeWidth,
         scale,
         "b",
       ),
@@ -748,14 +853,7 @@ function createSheetBorder(
   sheetRecord: AltiumRecord | undefined,
   scale: number,
 ): SchematicRect {
-  const width = Math.max(
-    Number(sheetRecord?.getCaseInsensitive("CUSTOMX") ?? 1000),
-    1,
-  )
-  const height = Math.max(
-    Number(sheetRecord?.getCaseInsensitive("CUSTOMY") ?? 800),
-    1,
-  )
+  const { height, width } = getAltiumSheetDimensions(sheetRecord)
   return {
     type: "schematic_rect",
     schematic_rect_id: "schematic_rect_altium_sheet_border",

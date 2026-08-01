@@ -21,7 +21,11 @@ test("TI sheet 17 converts components, ports, nets, and text idiomatically", asy
   )
   const circuitJson = convertAltiumSchDocToCircuitJson(
     parseAltiumSchDoc(source),
-    { sheetName: "TI TMDS62LEVM Rev. B — sheet 17" },
+    {
+      centerOnSchematicSheet: false,
+      schematicUnitScale: 0.1,
+      sheetName: "TI TMDS62LEVM Rev. B — sheet 17",
+    },
   )
   const dNoteLines = circuitJson.filter(
     (element): element is SchematicText =>
