@@ -5,11 +5,13 @@ import type {
   SchematicComponent,
   SchematicPort,
   SchematicText,
+  SchematicTrace,
 } from "circuit-json"
 import { any_circuit_element } from "circuit-json"
 import { convertAltiumSchDocToCircuitJson } from "../../lib"
 import { TI_TMDS62LEVM_FIXTURE_NAME } from "../../scripts/references/reference-manifest"
 import { readReferenceBytes } from "../helpers/read-reference"
+import { renderImportedSchematicToSvg } from "../helpers/render-imported-schematic"
 
 type SourceComponent = Extract<AnyCircuitElement, { type: "source_component" }>
 
@@ -141,6 +143,48 @@ test("TI sheet 17 converts components, ports, nets, and text idiomatically", asy
     ),
   ).toMatchObject({ symbol_name: "boxresistor_right" })
 
+  const testpointSource = circuitJson.find(
+    (element): element is SourceComponent =>
+      element.type === "source_component" && element.display_name === "TP98",
+  )
+  const testpointComponent = circuitJson.find(
+    (element): element is SchematicComponent =>
+      element.type === "schematic_component" &&
+      element.source_component_id === testpointSource?.source_component_id,
+  )
+  const testpointPort = circuitJson.find(
+    (element): element is SchematicPort =>
+      element.type === "schematic_port" &&
+      element.schematic_component_id ===
+        testpointComponent?.schematic_component_id,
+  )
+  const testpointLead = circuitJson.find(
+    (element): element is SchematicTrace =>
+      element.type === "schematic_trace" &&
+      element.schematic_trace_id === "schematic_trace_altium_port_lead_319",
+  )
+  expect(testpointComponent).toMatchObject({
+    center: { x: 23.5, y: 111 },
+    size: { height: 0.2, width: 0.325 },
+    symbol_name: "testpoint_left",
+  })
+  expect(testpointPort).toMatchObject({
+    center: { x: 23.7, y: 111 },
+    facing_direction: "right",
+    is_connected: true,
+    side_of_component: "right",
+  })
+  expect(testpointLead).toMatchObject({
+    edges: [
+      {
+        from: { x: 23.7, y: 111 },
+        from_schematic_port_id: testpointPort?.schematic_port_id,
+        to: { x: 25, y: 111 },
+      },
+    ],
+    source_trace_id: "source_trace_altium_15",
+  })
+
   expect(
     circuitJson.find(
       (element) =>
@@ -177,4 +221,9 @@ test("TI sheet 17 converts components, ports, nets, and text idiomatically", asy
       (element) => any_circuit_element.safeParse(element).success,
     ),
   ).toBe(true)
+
+  const renderedSvg = renderImportedSchematicToSvg(circuitJson)
+  expect(renderedSvg).not.toContain("Could not match ports")
+  expect(renderedSvg).not.toContain("Symbol not found")
+  expect(renderedSvg).not.toContain("NaN")
 })

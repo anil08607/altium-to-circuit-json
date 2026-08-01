@@ -2,6 +2,7 @@ import { expect, test } from "bun:test"
 import { parseAltiumSchDoc, serializeAltiumSheetToSvg } from "altiumts"
 import { any_circuit_element } from "circuit-json"
 import { convertAltiumToCircuitJson } from "../../lib"
+import { findDetachedSymbolPortIds } from "../helpers/find-detached-symbol-ports"
 import { readReferenceBytes } from "../helpers/read-reference"
 import { renderImportedSchematicToSvg } from "../helpers/render-imported-schematic"
 import { stackAltiumAndCircuitJsonSvgs } from "../helpers/stack-svg-comparison"
@@ -31,6 +32,7 @@ test(
         (element) => any_circuit_element.safeParse(element).success,
       ),
     ).toBe(true)
+    expect(findDetachedSymbolPortIds(circuitJson)).toEqual([])
 
     const altiumSvg = serializeAltiumSheetToSvg(document, {
       height: 600,
@@ -38,6 +40,9 @@ test(
       width: 800,
     })
     const circuitJsonSvg = renderImportedSchematicToSvg(circuitJson)
+    expect(circuitJsonSvg).not.toContain("Could not match ports")
+    expect(circuitJsonSvg).not.toContain("Symbol not found")
+    expect(circuitJsonSvg).not.toContain("NaN")
     const comparisonSvg = stackAltiumAndCircuitJsonSvgs(
       altiumSvg,
       circuitJsonSvg,

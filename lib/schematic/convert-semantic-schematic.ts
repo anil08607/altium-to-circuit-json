@@ -20,6 +20,7 @@ import {
   source_simple_inductor,
   source_simple_resistor,
 } from "circuit-json"
+import { type SchSymbol, symbols } from "schematic-symbols"
 
 export interface SemanticSchematicOptions {
   includeHidden?: boolean
@@ -38,6 +39,17 @@ interface ConvertedPort {
   record: AltiumRecord
   schematicPort: SchematicPort
   sourcePort: SourcePort
+}
+
+interface SymbolPortAssignment {
+  convertedPort: ConvertedPort
+  symbolPort: SchSymbol["ports"][number]
+}
+
+interface SymbolSelection {
+  assignments: SymbolPortAssignment[]
+  name: string
+  symbol: SchSymbol
 }
 
 interface SemanticNet {
@@ -74,6 +86,15 @@ const VECTOR_BY_DIRECTION: Readonly<Record<CardinalDirection, AltiumPoint>> = {
   right: { x: 1, y: 0 },
   up: { x: 0, y: 1 },
 }
+
+const CARDINAL_DIRECTIONS: readonly CardinalDirection[] = [
+  "right",
+  "up",
+  "left",
+  "down",
+]
+
+const SYMBOL_CATALOG = symbols as Record<string, SchSymbol | undefined>
 
 /**
  * Converts records that have native Circuit JSON semantics before the
@@ -196,6 +217,34 @@ function convertComponents(params: {
         sourceComponentId,
       }),
     )
+    const bodyBounds = getComponentBodyBounds(
+      visibleOwnedRecords,
+      componentPorts.map(({ point }) => point),
+    )
+    const symbolSelection = selectCircuitJsonSymbol({
+      designator,
+      libraryReference,
+      ports: componentPorts,
+    })
+    const center = scalePoint(getBoundsCenter(bodyBounds), options.scale)
+    const size = symbolSelection
+      ? { ...symbolSelection.symbol.size }
+      : {
+          height: Math.max(
+            (bodyBounds.maxY - bodyBounds.minY) * options.scale,
+            0.4,
+          ),
+          width: Math.max(
+            (bodyBounds.maxX - bodyBounds.minX) * options.scale,
+            0.4,
+          ),
+        }
+    if (symbolSelection) {
+      applyNativeSymbolPortGeometry({
+        center,
+        selection: symbolSelection,
+      })
+    }
     convertedPorts.push(...componentPorts)
     elements.push(
       ...componentPorts.flatMap(({ sourcePort, schematicPort }) => [
@@ -203,30 +252,6 @@ function convertComponents(params: {
         schematicPort,
       ]),
     )
-
-    const bodyBounds = getComponentBodyBounds(
-      visibleOwnedRecords,
-      componentPorts.map(({ point }) => point),
-    )
-    const symbolName = inferCircuitJsonSymbolName({
-      designator,
-      libraryReference,
-      ports: componentPorts,
-    })
-    const componentBounds = symbolName
-      ? getBoundsForPoints(componentPorts.map(({ point }) => point))
-      : bodyBounds
-    const center = scalePoint(getBoundsCenter(componentBounds), options.scale)
-    const size = {
-      height: Math.max(
-        (componentBounds.maxY - componentBounds.minY) * options.scale,
-        0.4,
-      ),
-      width: Math.max(
-        (componentBounds.maxX - componentBounds.minX) * options.scale,
-        0.4,
-      ),
-    }
     const schematicComponent: SchematicComponent = {
       type: "schematic_component",
       center,
@@ -238,11 +263,11 @@ function convertComponents(params: {
       size,
       source_component_id: sourceComponentId,
       symbol_display_value: value,
-      ...(symbolName ? { symbol_name: symbolName } : {}),
+      ...(symbolSelection ? { symbol_name: symbolSelection.name } : {}),
     }
     elements.push(schematicComponent)
 
-    if (!symbolName && options.includeText !== false) {
+    if (!symbolSelection && options.includeText !== false) {
       elements.push(
         createComponentText({
           anchor: "bottom_left",
@@ -708,12 +733,11 @@ function convertConnectivity(params: {
 
   for (const [netIndex, net] of graph.nets.entries()) {
     const wires = net.records.filter((record) => record.recordKind === "27")
-    const connectedPorts = uniqueStrings(
-      net.points.flatMap((point) =>
-        (portsByPoint.get(pointKey(point)) ?? []).map(
-          ({ sourcePort }) => sourcePort.source_port_id,
-        ),
-      ),
+    const connectedConvertedPorts = uniqueConvertedPorts(
+      net.points.flatMap((point) => portsByPoint.get(pointKey(point)) ?? []),
+    )
+    const connectedPorts = connectedConvertedPorts.map(
+      ({ sourcePort }) => sourcePort.source_port_id,
     )
     if (
       wires.length === 0 &&
@@ -781,20 +805,21 @@ function convertConnectivity(params: {
           if (!segmentFrom || !segmentTo) continue
           const fromPort = portsByPoint.get(pointKey(segmentFrom))?.[0]
           const toPort = portsByPoint.get(pointKey(segmentTo))?.[0]
+          const fromPortId = getPortIdAtElectricalPoint(
+            fromPort,
+            segmentFrom,
+            options.scale,
+          )
+          const toPortId = getPortIdAtElectricalPoint(
+            toPort,
+            segmentTo,
+            options.scale,
+          )
           edges.push({
             from: scalePoint(segmentFrom, options.scale),
             to: scalePoint(segmentTo, options.scale),
-            ...(fromPort
-              ? {
-                  from_schematic_port_id:
-                    fromPort.schematicPort.schematic_port_id,
-                }
-              : {}),
-            ...(toPort
-              ? {
-                  to_schematic_port_id: toPort.schematicPort.schematic_port_id,
-                }
-              : {}),
+            ...(fromPortId ? { from_schematic_port_id: fromPortId } : {}),
+            ...(toPortId ? { to_schematic_port_id: toPortId } : {}),
           })
         }
       }
@@ -804,6 +829,29 @@ function convertConnectivity(params: {
         junctions: wireIndexWithinNet === 0 ? netJunctions : [],
         schematic_sheet_id: options.schematicSheetId,
         schematic_trace_id: schematicTraceId,
+        source_trace_id: sourceTraceId,
+      } satisfies SchematicTrace)
+    }
+
+    for (const convertedPort of connectedConvertedPorts) {
+      const electricalTerminal = scalePoint(convertedPort.point, options.scale)
+      if (pointsEqual(convertedPort.schematicPort.center, electricalTerminal)) {
+        continue
+      }
+      const portRecordIndex = document.records.indexOf(convertedPort.record)
+      elements.push({
+        type: "schematic_trace",
+        edges: [
+          {
+            from: convertedPort.schematicPort.center,
+            from_schematic_port_id:
+              convertedPort.schematicPort.schematic_port_id,
+            to: electricalTerminal,
+          },
+        ],
+        junctions: [],
+        schematic_sheet_id: options.schematicSheetId,
+        schematic_trace_id: `schematic_trace_altium_port_lead_${portRecordIndex}`,
         source_trace_id: sourceTraceId,
       } satisfies SchematicTrace)
     }
@@ -930,29 +978,156 @@ function getOrCreateSourceNet(params: {
   return sourceNetId
 }
 
-function inferCircuitJsonSymbolName(params: {
+function selectCircuitJsonSymbol(params: {
   designator: string
   libraryReference: string
   ports: ConvertedPort[]
-}): string | undefined {
+}): SymbolSelection | undefined {
   const { designator, libraryReference, ports } = params
   const classification = classifyComponent({ designator, libraryReference })
+  let baseName: string | undefined
   if (classification === "testpoint" && ports.length === 1) {
-    return `testpoint_${ports[0]?.schematicPort.facing_direction ?? "up"}`
+    baseName = "testpoint"
+  } else if (ports.length !== 2) {
+    return undefined
+  } else if (classification === "resistor") {
+    baseName = "boxresistor"
+  } else if (classification === "capacitor") {
+    baseName = "capacitor"
+  } else if (classification === "inductor") {
+    baseName = "inductor"
+  } else if (classification === "led") {
+    baseName = "led"
   }
-  if (ports.length !== 2) return undefined
-
-  const direction = getTwoPinSymbolDirection(ports)
-  if (classification === "resistor") return `boxresistor_${direction}`
-  if (classification === "capacitor") return `capacitor_${direction}`
-  if (classification === "inductor") return `inductor_${direction}`
-  if (classification === "led") return `led_${direction}`
   if (classification === "diode") {
     const lower = libraryReference.toLowerCase()
-    if (lower.includes("schottky")) return `schottky_diode_${direction}`
-    return `diode_${direction}`
+    baseName = lower.includes("schottky") ? "schottky_diode" : "diode"
   }
-  return undefined
+  if (!baseName) return undefined
+
+  const selections = CARDINAL_DIRECTIONS.flatMap((direction) => {
+    const name = `${baseName}_${direction}`
+    const symbol = SYMBOL_CATALOG[name]
+    if (!symbol || symbol.ports.length !== ports.length) return []
+    const assignments = assignConvertedPortsToSymbolPorts(ports, symbol)
+    return assignments.length === ports.length
+      ? [{ assignments, name, symbol } satisfies SymbolSelection]
+      : []
+  })
+  return selections.sort(
+    (left, right) =>
+      getSymbolDirectionScore(left) - getSymbolDirectionScore(right),
+  )[0]
+}
+
+function assignConvertedPortsToSymbolPorts(
+  ports: ConvertedPort[],
+  symbol: SchSymbol,
+): SymbolPortAssignment[] {
+  const unusedSymbolPorts = new Set(symbol.ports)
+  const orderedPorts = [...ports].sort(compareConvertedPorts)
+  const assignments: SymbolPortAssignment[] = []
+
+  for (const [portIndex, convertedPort] of orderedPorts.entries()) {
+    const hints = new Set(
+      [
+        convertedPort.schematicPort.pin_number?.toString(),
+        convertedPort.sourcePort.name,
+        ...(convertedPort.sourcePort.port_hints ?? []),
+      ]
+        .filter((hint): hint is string => Boolean(hint))
+        .map((hint) => hint.toLowerCase()),
+    )
+    const matchingSymbolPort = [...unusedSymbolPorts].find((symbolPort) =>
+      symbolPort.labels.some((label) => hints.has(label.toLowerCase())),
+    )
+    const symbolPort =
+      matchingSymbolPort ?? symbol.ports[portIndex] ?? [...unusedSymbolPorts][0]
+    if (!symbolPort) continue
+    unusedSymbolPorts.delete(symbolPort)
+    assignments.push({ convertedPort, symbolPort })
+  }
+  return assignments
+}
+
+function compareConvertedPorts(
+  left: ConvertedPort,
+  right: ConvertedPort,
+): number {
+  const leftPinNumber = left.schematicPort.pin_number
+  const rightPinNumber = right.schematicPort.pin_number
+  if (leftPinNumber !== undefined && rightPinNumber !== undefined) {
+    return leftPinNumber - rightPinNumber
+  }
+  return (
+    (left.schematicPort.true_ccw_index ?? 0) -
+    (right.schematicPort.true_ccw_index ?? 0)
+  )
+}
+
+function getSymbolDirectionScore(selection: SymbolSelection): number {
+  const [first, second] = selection.assignments
+  if (!first) return Number.POSITIVE_INFINITY
+  if (!second) {
+    const expectedDirection =
+      VECTOR_BY_DIRECTION[
+        first.convertedPort.schematicPort.facing_direction ?? "right"
+      ]
+    return getVectorDifference(
+      expectedDirection,
+      subtractPoints(first.symbolPort, selection.symbol.center),
+    )
+  }
+  return getVectorDifference(
+    subtractPoints(second.convertedPort.point, first.convertedPort.point),
+    subtractPoints(second.symbolPort, first.symbolPort),
+  )
+}
+
+function getVectorDifference(left: AltiumPoint, right: AltiumPoint): number {
+  const leftLength = Math.hypot(left.x, left.y)
+  const rightLength = Math.hypot(right.x, right.y)
+  if (leftLength === 0 || rightLength === 0) {
+    return Number.POSITIVE_INFINITY
+  }
+  const cosine =
+    (left.x * right.x + left.y * right.y) / (leftLength * rightLength)
+  return 1 - Math.max(-1, Math.min(1, cosine))
+}
+
+function applyNativeSymbolPortGeometry(params: {
+  center: AltiumPoint
+  selection: SymbolSelection
+}): void {
+  const { center, selection } = params
+  for (const { convertedPort, symbolPort } of selection.assignments) {
+    const offset = subtractPoints(symbolPort, selection.symbol.center)
+    const direction = getDirectionForVector(offset)
+    convertedPort.schematicPort.center = {
+      x: center.x + offset.x,
+      y: center.y + offset.y,
+    }
+    convertedPort.schematicPort.distance_from_component_edge = Math.hypot(
+      offset.x,
+      offset.y,
+    )
+    convertedPort.schematicPort.facing_direction = direction
+    convertedPort.schematicPort.side_of_component = directionToSide(direction)
+  }
+}
+
+function getDirectionForVector(vector: AltiumPoint): CardinalDirection {
+  if (Math.abs(vector.x) >= Math.abs(vector.y)) {
+    return vector.x >= 0 ? "right" : "left"
+  }
+  return vector.y >= 0 ? "up" : "down"
+}
+
+function subtractPoints(
+  left: { x: number; y: number },
+  right: { x: number; y: number },
+): AltiumPoint {
+  return { x: left.x - right.x, y: left.y - right.y }
 }
 
 function classifyComponent(params: {
@@ -980,18 +1155,6 @@ function classifyComponent(params: {
   if (prefix === "L" || lowerReference.includes("inductor")) return "inductor"
   if (prefix === "D" || lowerReference.includes("diode")) return "diode"
   return "unknown"
-}
-
-function getTwoPinSymbolDirection(ports: ConvertedPort[]): CardinalDirection {
-  const [first, second] = [...ports].sort(
-    (a, b) =>
-      (a.schematicPort.pin_number ?? 0) - (b.schematicPort.pin_number ?? 0),
-  )
-  if (!first || !second) return "right"
-  const dx = second.point.x - first.point.x
-  const dy = second.point.y - first.point.y
-  if (Math.abs(dx) >= Math.abs(dy)) return dx >= 0 ? "right" : "left"
-  return dy >= 0 ? "up" : "down"
 }
 
 function getPowerPortSymbolName(
@@ -1113,6 +1276,30 @@ function groupByPoint(ports: ConvertedPort[]): Map<string, ConvertedPort[]> {
     else grouped.set(key, [port])
   }
   return grouped
+}
+
+function uniqueConvertedPorts(ports: ConvertedPort[]): ConvertedPort[] {
+  const seenSourcePortIds = new Set<string>()
+  return ports.filter((port) => {
+    const sourcePortId = port.sourcePort.source_port_id
+    if (seenSourcePortIds.has(sourcePortId)) return false
+    seenSourcePortIds.add(sourcePortId)
+    return true
+  })
+}
+
+function getPortIdAtElectricalPoint(
+  port: ConvertedPort | undefined,
+  electricalPoint: AltiumPoint,
+  scale: number,
+): string | undefined {
+  if (!port) return undefined
+  return pointsEqual(
+    port.schematicPort.center,
+    scalePoint(electricalPoint, scale),
+  )
+    ? port.schematicPort.schematic_port_id
+    : undefined
 }
 
 function getBoundsForPoints(points: AltiumPoint[]): Bounds {
