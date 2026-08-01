@@ -19,5 +19,5 @@ export function renderImportedSchematicToSvg(
     height: 600,
     width: 800,
     ...options,
-  })
+  }).replace(/[ \t]+$/gmu, "")
 }
