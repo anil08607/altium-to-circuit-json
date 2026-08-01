@@ -13,6 +13,7 @@ import { readReferenceBytes } from "../helpers/read-reference"
 import { renderImportedSchematicToSvg } from "../helpers/render-imported-schematic"
 
 type SourceComponent = Extract<AnyCircuitElement, { type: "source_component" }>
+type SourcePortElement = Extract<AnyCircuitElement, { type: "source_port" }>
 
 async function convertTiSheet(
   sheetNumber: string,
@@ -93,6 +94,76 @@ test("TI sheet 13 maps a three-pin MOSFET by functional port geometry", async ()
       },
     ],
   })
+  expectCleanSymbolRendering(circuitJson)
+})
+
+test("TI sheet 32 collapses equivalent power MOSFET pads schematically", async () => {
+  const circuitJson = await convertTiSheet("32")
+  const source = circuitJson.find(
+    (element): element is SourceComponent =>
+      element.type === "source_component" && element.name === "Q9",
+  )
+  const component = circuitJson.find(
+    (element): element is SchematicComponent =>
+      element.type === "schematic_component" &&
+      element.source_component_id === source?.source_component_id,
+  )
+  const sourcePorts = circuitJson.filter(
+    (element): element is SourcePortElement =>
+      element.type === "source_port" &&
+      element.source_component_id === source?.source_component_id,
+  )
+  const schematicPorts = circuitJson.filter(
+    (element): element is SchematicPort =>
+      element.type === "schematic_port" &&
+      element.schematic_component_id === component?.schematic_component_id,
+  )
+  const sourceTraces = circuitJson.filter(
+    (element) => element.type === "source_trace",
+  )
+  const schematicTraceIds = new Set(
+    circuitJson.flatMap((element) =>
+      element.type === "schematic_trace" ? [element.schematic_trace_id] : [],
+    ),
+  )
+
+  expect(source).toMatchObject({
+    channel_type: "n",
+    ftype: "simple_mosfet",
+    mosfet_mode: "enhancement",
+  })
+  expect(component).toMatchObject({
+    symbol_name: "n_channel_e_mosfet_transistor_gate_left_drain_top",
+  })
+  expect(sourcePorts).toHaveLength(8)
+  expect(
+    schematicPorts.map((port) => ({
+      center: port.center,
+      name: port.display_pin_label,
+      pin: port.pin_number,
+    })),
+  ).toEqual([
+    { center: { x: 182.8, y: 28.05 }, name: "D3", pin: 5 },
+    { center: { x: 182.08, y: 27.4 }, name: "G", pin: 3 },
+    { center: { x: 182.81, y: 26.95 }, name: "S2", pin: 7 },
+  ])
+  expect(
+    sourceTraces.some(
+      (trace) =>
+        trace.connected_source_port_ids?.filter((id) =>
+          sourcePorts.some((port) => port.source_port_id === id),
+        ).length === 5,
+    ),
+  ).toBe(true)
+  expect(schematicTraceIds.has("schematic_trace_altium_port_lead_1585")).toBe(
+    false,
+  )
+  expect(schematicTraceIds.has("schematic_trace_altium_port_lead_1599")).toBe(
+    false,
+  )
+  expect(schematicTraceIds.has("schematic_trace_altium_port_lead_1589")).toBe(
+    true,
+  )
   expectCleanSymbolRendering(circuitJson)
 })
 

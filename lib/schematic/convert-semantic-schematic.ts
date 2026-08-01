@@ -38,6 +38,7 @@ export interface SemanticSchematicConversion {
 }
 
 interface ConvertedPort {
+  isSchematicVisible: boolean
   point: AltiumPoint
   record: AltiumRecord
   schematicPort: SchematicPort
@@ -252,10 +253,12 @@ function convertComponents(params: {
     }
     convertedPorts.push(...componentPorts)
     elements.push(
-      ...componentPorts.flatMap(({ sourcePort, schematicPort }) => [
-        sourcePort,
-        schematicPort,
-      ]),
+      ...componentPorts.flatMap(
+        ({ isSchematicVisible, sourcePort, schematicPort }) => [
+          sourcePort,
+          ...(isSchematicVisible ? [schematicPort] : []),
+        ],
+      ),
     )
     const schematicComponent: SchematicComponent = {
       type: "schematic_component",
@@ -369,7 +372,13 @@ function convertComponentPin(params: {
       ? { has_output_arrow: true }
       : {}),
   }
-  return { point: terminalPoint, record: pin, schematicPort, sourcePort }
+  return {
+    isSchematicVisible: true,
+    point: terminalPoint,
+    record: pin,
+    schematicPort,
+    sourcePort,
+  }
 }
 
 function createSourceComponent(params: {
@@ -438,7 +447,7 @@ function createSourceComponent(params: {
       if (parsed.success) return parsed.data
     }
   }
-  if (classification === "mosfet" && pinCount === 3) {
+  if (classification === "mosfet" && pinCount >= 3) {
     const parsed = source_simple_mosfet.safeParse({
       ...common,
       ...getMosfetVariant(libraryReference),
@@ -811,11 +820,16 @@ function convertConnectivity(params: {
         return location ? [scalePoint(location, options.scale)] : []
       })
 
-    for (const [wireIndexWithinNet, wire] of wires.entries()) {
-      handledRecords.add(wire)
+    for (const wire of wires) handledRecords.add(wire)
+    const prunedSegmentKeys = getEquivalentPortPrunedSegmentKeys({
+      convertedPorts: connectedConvertedPorts,
+      net,
+      wires,
+    })
+    let renderedWireIndex = 0
+    for (const wire of wires) {
       const wireRecordIndex = document.records.indexOf(wire)
       const schematicTraceId = `schematic_trace_altium_${wireRecordIndex}`
-      schematicTraceIdByRecord.set(wire, schematicTraceId)
       const points = getSchematicRecordPoints(wire)
       const edges: SchematicTrace["edges"] = []
       for (let pointIndex = 1; pointIndex < points.length; pointIndex++) {
@@ -831,8 +845,15 @@ function convertConnectivity(params: {
           const segmentFrom = segmentPoints[segmentPointIndex - 1]
           const segmentTo = segmentPoints[segmentPointIndex]
           if (!segmentFrom || !segmentTo) continue
-          const fromPort = portsByPoint.get(pointKey(segmentFrom))?.[0]
-          const toPort = portsByPoint.get(pointKey(segmentTo))?.[0]
+          if (prunedSegmentKeys.has(segmentKey(segmentFrom, segmentTo))) {
+            continue
+          }
+          const fromPort = portsByPoint
+            .get(pointKey(segmentFrom))
+            ?.find((port) => port.isSchematicVisible)
+          const toPort = portsByPoint
+            .get(pointKey(segmentTo))
+            ?.find((port) => port.isSchematicVisible)
           const fromPortId = getPortIdAtElectricalPoint(
             fromPort,
             segmentFrom,
@@ -851,17 +872,21 @@ function convertConnectivity(params: {
           })
         }
       }
+      if (edges.length === 0) continue
+      schematicTraceIdByRecord.set(wire, schematicTraceId)
       elements.push({
         type: "schematic_trace",
         edges,
-        junctions: wireIndexWithinNet === 0 ? netJunctions : [],
+        junctions: renderedWireIndex === 0 ? netJunctions : [],
         schematic_sheet_id: options.schematicSheetId,
         schematic_trace_id: schematicTraceId,
         source_trace_id: sourceTraceId,
       } satisfies SchematicTrace)
+      renderedWireIndex++
     }
 
     for (const convertedPort of connectedConvertedPorts) {
+      if (!convertedPort.isSchematicVisible) continue
       const electricalTerminal = scalePoint(convertedPort.point, options.scale)
       if (pointsEqual(convertedPort.schematicPort.center, electricalTerminal)) {
         continue
@@ -879,7 +904,10 @@ function convertConnectivity(params: {
 
     const connectedPortIds = new Set(connectedPorts)
     for (const convertedPort of convertedPorts) {
-      if (connectedPortIds.has(convertedPort.sourcePort.source_port_id)) {
+      if (
+        convertedPort.isSchematicVisible &&
+        connectedPortIds.has(convertedPort.sourcePort.source_port_id)
+      ) {
         convertedPort.schematicPort.is_connected = true
       }
     }
@@ -890,6 +918,93 @@ function convertConnectivity(params: {
     sourceNetIdByName,
     sourceNetIdByRecord,
   }
+}
+
+function getEquivalentPortPrunedSegmentKeys(params: {
+  convertedPorts: ConvertedPort[]
+  net: SemanticNet
+  wires: AltiumRecord[]
+}): Set<string> {
+  const { convertedPorts, net, wires } = params
+  const hiddenPortPoints = convertedPorts
+    .filter((port) => !port.isSchematicVisible)
+    .map((port) => port.point)
+  if (hiddenPortPoints.length === 0) return new Set()
+
+  const protectedPointKeys = new Set(
+    convertedPorts
+      .filter((port) => port.isSchematicVisible)
+      .map((port) => pointKey(port.point)),
+  )
+  for (const record of net.records) {
+    if (!["4", "17", "18", "25"].includes(record.recordKind ?? "")) continue
+    const location = getLocation(record)
+    if (location) protectedPointKeys.add(pointKey(location))
+  }
+
+  interface PrunableSegment {
+    endKey: string
+    key: string
+    startKey: string
+  }
+  const segments = new Map<string, PrunableSegment>()
+  const segmentKeysByPoint = new Map<string, Set<string>>()
+  const addIncidentSegment = (point: AltiumPoint, key: string): void => {
+    const pointSegments = segmentKeysByPoint.get(pointKey(point))
+    if (pointSegments) pointSegments.add(key)
+    else segmentKeysByPoint.set(pointKey(point), new Set([key]))
+  }
+
+  for (const wire of wires) {
+    const wirePoints = getSchematicRecordPoints(wire)
+    for (let pointIndex = 1; pointIndex < wirePoints.length; pointIndex++) {
+      const from = wirePoints[pointIndex - 1]
+      const to = wirePoints[pointIndex]
+      if (!from || !to) continue
+      const segmentPoints = splitSegmentAtPoints(from, to, net.points)
+      for (
+        let splitIndex = 1;
+        splitIndex < segmentPoints.length;
+        splitIndex++
+      ) {
+        const segmentFrom = segmentPoints[splitIndex - 1]
+        const segmentTo = segmentPoints[splitIndex]
+        if (!segmentFrom || !segmentTo) continue
+        const key = segmentKey(segmentFrom, segmentTo)
+        segments.set(key, {
+          endKey: pointKey(segmentTo),
+          key,
+          startKey: pointKey(segmentFrom),
+        })
+        addIncidentSegment(segmentFrom, key)
+        addIncidentSegment(segmentTo, key)
+      }
+    }
+  }
+
+  const removedSegmentKeys = new Set<string>()
+  const pendingPointKeys = hiddenPortPoints.map((point) => pointKey(point))
+  while (pendingPointKeys.length > 0) {
+    const currentPointKey = pendingPointKeys.shift()
+    if (!currentPointKey || protectedPointKeys.has(currentPointKey)) continue
+    const activeSegmentKeys = [
+      ...(segmentKeysByPoint.get(currentPointKey) ?? []),
+    ].filter((key) => !removedSegmentKeys.has(key))
+    if (activeSegmentKeys.length !== 1) continue
+    const segment = segments.get(activeSegmentKeys[0] ?? "")
+    if (!segment) continue
+    removedSegmentKeys.add(segment.key)
+    pendingPointKeys.push(
+      segment.startKey === currentPointKey ? segment.endKey : segment.startKey,
+    )
+  }
+  return removedSegmentKeys
+}
+
+function segmentKey(start: AltiumPoint, end: AltiumPoint): string {
+  const startKey = pointKey(start)
+  const endKey = pointKey(end)
+  return startKey < endKey ? `${startKey}|${endKey}` : `${endKey}|${startKey}`
 }
 
 function createPortLeadEdges(
@@ -1048,7 +1163,11 @@ function selectCircuitJsonSymbol(params: {
     baseName = "crystal"
   } else if (classification === "crystal" && ports.length === 4) {
     baseName = "crystal_4pin"
-  } else if (classification === "mosfet" && ports.length === 3) {
+  } else if (
+    classification === "mosfet" &&
+    ports.length >= 3 &&
+    hasCompleteMosfetFunctionalGroups(ports)
+  ) {
     const { channel_type, mosfet_mode } = getMosfetVariant(libraryReference)
     const channel = channel_type === "p" ? "p" : "n"
     const mode = mosfet_mode === "depletion" ? "d" : "e"
@@ -1082,8 +1201,16 @@ function selectCircuitJsonSymbol(params: {
 
   const selections = candidateNames.flatMap((name) => {
     const symbol = SYMBOL_CATALOG[name]
-    if (!symbol || symbol.ports.length !== ports.length) return []
+    const supportsEquivalentMosfetPads =
+      classification === "mosfet" && symbol?.ports.length === 3
+    if (
+      !symbol ||
+      (!supportsEquivalentMosfetPads && symbol.ports.length !== ports.length)
+    ) {
+      return []
+    }
     const assignments = assignConvertedPortsToSymbolPorts(ports, symbol, {
+      allowFunctionalPortReuse: classification === "mosfet",
       geometryInterchangeableLabels:
         classification === "crystal" && ports.length === 4
           ? new Set(["2", "4"])
@@ -1099,10 +1226,22 @@ function selectCircuitJsonSymbol(params: {
   )[0]
 }
 
+function hasCompleteMosfetFunctionalGroups(ports: ConvertedPort[]): boolean {
+  const groups = ports.map((port) =>
+    normalizeFunctionalPortLabel(port.sourcePort.name),
+  )
+  return (
+    groups.every((group) => group !== undefined) && new Set(groups).size === 3
+  )
+}
+
 function assignConvertedPortsToSymbolPorts(
   ports: ConvertedPort[],
   symbol: SchSymbol,
-  options: { geometryInterchangeableLabels?: Set<string> } = {},
+  options: {
+    allowFunctionalPortReuse?: boolean
+    geometryInterchangeableLabels?: Set<string>
+  } = {},
 ): SymbolPortAssignment[] {
   const unusedSymbolPorts = new Set(symbol.ports)
   const orderedPorts = [...ports].sort(compareConvertedPorts)
@@ -1121,7 +1260,10 @@ function assignConvertedPortsToSymbolPorts(
         return normalized ? [normalized] : []
       }),
     )
-    const functionalSymbolPort = [...unusedSymbolPorts].find((symbolPort) =>
+    const functionalPortCandidates = options.allowFunctionalPortReuse
+      ? symbol.ports
+      : [...unusedSymbolPorts]
+    const functionalSymbolPort = functionalPortCandidates.find((symbolPort) =>
       symbolPort.labels.some((label) => {
         const normalized = normalizeFunctionalPortLabel(label)
         return normalized ? functionalHints.has(normalized) : false
@@ -1161,7 +1303,9 @@ function assignConvertedPortsToSymbolPorts(
       symbol.ports[portIndex] ??
       [...unusedSymbolPorts][0]
     if (!symbolPort) continue
-    unusedSymbolPorts.delete(symbolPort)
+    if (!functionalSymbolPort || !options.allowFunctionalPortReuse) {
+      unusedSymbolPorts.delete(symbolPort)
+    }
     assignments.push({ convertedPort, symbolPort })
   }
   return assignments
@@ -1259,20 +1403,50 @@ function applyNativeSymbolPortGeometry(params: {
   selection: SymbolSelection
 }): void {
   const { center, selection } = params
-  for (const { convertedPort, symbolPort } of selection.assignments) {
+  const assignmentsBySymbolPort = new Map<
+    SchSymbol["ports"][number],
+    SymbolPortAssignment[]
+  >()
+  for (const assignment of selection.assignments) {
+    const assignments = assignmentsBySymbolPort.get(assignment.symbolPort)
+    if (assignments) assignments.push(assignment)
+    else assignmentsBySymbolPort.set(assignment.symbolPort, [assignment])
+  }
+
+  for (const [symbolPort, assignments] of assignmentsBySymbolPort) {
     const offset = subtractPoints(symbolPort, selection.symbol.center)
     const direction = getDirectionForVector(offset)
-    convertedPort.schematicPort.center = {
+    const symbolPortCenter = {
       x: center.x + offset.x,
       y: center.y + offset.y,
     }
-    convertedPort.schematicPort.distance_from_component_edge = Math.hypot(
-      offset.x,
-      offset.y,
-    )
-    convertedPort.schematicPort.facing_direction = direction
-    convertedPort.schematicPort.side_of_component = directionToSide(direction)
+    const representative = assignments.sort(
+      (left, right) =>
+        getPointDistance(
+          left.convertedPort.schematicPort.center,
+          symbolPortCenter,
+        ) -
+        getPointDistance(
+          right.convertedPort.schematicPort.center,
+          symbolPortCenter,
+        ),
+    )[0]
+    for (const { convertedPort } of assignments) {
+      convertedPort.isSchematicVisible =
+        convertedPort === representative?.convertedPort
+      convertedPort.schematicPort.center = symbolPortCenter
+      convertedPort.schematicPort.distance_from_component_edge = Math.hypot(
+        offset.x,
+        offset.y,
+      )
+      convertedPort.schematicPort.facing_direction = direction
+      convertedPort.schematicPort.side_of_component = directionToSide(direction)
+    }
   }
+}
+
+function getPointDistance(left: AltiumPoint, right: AltiumPoint): number {
+  return Math.hypot(left.x - right.x, left.y - right.y)
 }
 
 function getDirectionForVector(vector: AltiumPoint): CardinalDirection {
@@ -1498,7 +1672,7 @@ function getPortIdAtElectricalPoint(
   electricalPoint: AltiumPoint,
   scale: number,
 ): string | undefined {
-  if (!port) return undefined
+  if (!port?.isSchematicVisible) return undefined
   return pointsEqual(
     port.schematicPort.center,
     scalePoint(electricalPoint, scale),
