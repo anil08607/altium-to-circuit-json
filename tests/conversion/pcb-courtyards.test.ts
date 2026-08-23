@@ -78,12 +78,12 @@ test("does not emit courtyards without their owning components", () => {
 test("PCB courtyards: Altium source and Circuit JSON SVG", async () => {
   const circuitJson = convertAltiumPcbDocToCircuitJson(courtyardSnapshotPcbDoc)
   const altiumSvg = serializeAltiumPcbToSvg(courtyardSnapshotPcbDoc, {
-    height: 600,
+    height: 800,
     title: "Altium courtyard source",
     width: 800,
   })
   const circuitJsonSvg = convertCircuitJsonToPcbSvg(circuitJson, {
-    height: 600,
+    height: 800,
     matchBoardAspectRatio: true,
     showCourtyards: true,
     width: 800,
