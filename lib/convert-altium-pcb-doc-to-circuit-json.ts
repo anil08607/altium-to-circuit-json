@@ -5,11 +5,13 @@ import {
   type AltiumPcbDocument,
   type AltiumPoint,
   type AltiumRecord,
+  AltiumRegionRecord,
   AltiumTextRecord,
   AltiumTrackRecord,
   AltiumViaRecord,
   getAltiumBounds,
   getPcbLayerStack,
+  getPcbRegionGeometry,
   parseAltiumMeasurementToMils,
 } from "altiumts"
 import type {
@@ -17,6 +19,7 @@ import type {
   LayerRef,
   PcbBoard,
   PcbComponent,
+  PcbCourtyardOutline,
   PcbCutout,
   PcbHole,
   PcbPlatedHole,
@@ -36,6 +39,7 @@ const BOARD_GRAPHICS_COMPONENT_ID = "pcb_component_altium_board_graphics"
 export interface ConvertAltiumPcbDocOptions {
   includeBoardOutline?: boolean
   includeComponents?: boolean
+  includeCourtyards?: boolean
   includePads?: boolean
   includeSilkscreen?: boolean
   includeTraces?: boolean
@@ -86,6 +90,13 @@ export function convertAltiumPcbDocToCircuitJson(
     }
   }
 
+  if (
+    options.includeCourtyards !== false &&
+    options.includeComponents !== false
+  ) {
+    elements.push(...convertCourtyards(document))
+  }
+
   for (const [index, record] of document.records.entries()) {
     if (record instanceof AltiumPadRecord && options.includePads !== false) {
       const pad = convertPad(record, index)
@@ -94,6 +105,7 @@ export function convertAltiumPcbDocToCircuitJson(
     }
 
     if (record instanceof AltiumTrackRecord) {
+      if (isCourtyardLayer(record.layer)) continue
       if (isOverlayLayer(record.layer)) {
         if (options.includeSilkscreen === false) continue
         const line = convertSilkscreenLine(record, index)
@@ -131,6 +143,184 @@ export function convertAltiumPcbDocToCircuitJson(
   }
 
   return elements
+}
+
+interface CourtyardPath {
+  componentId: string
+  layer: "top" | "bottom"
+  points: AltiumPoint[]
+  strokeWidthMils: number
+}
+
+function convertCourtyards(document: AltiumPcbDocument): PcbCourtyardOutline[] {
+  const componentIds = new Map(
+    document.components.flatMap((component, index) =>
+      component.position ? [[component, componentId(index)] as const] : [],
+    ),
+  )
+  const paths: CourtyardPath[] = []
+
+  for (const record of document.records) {
+    const layer = getLayer(record)
+    if (!isCourtyardLayer(layer)) continue
+    const component = document.getComponentForRecord(record)
+    const ownedComponentId = component ? componentIds.get(component) : undefined
+    if (!ownedComponentId) continue
+    const points = getCourtyardRecordPoints(record)
+    if (points.length < 2) continue
+    paths.push({
+      componentId: ownedComponentId,
+      layer: mapCourtyardLayer(layer),
+      points,
+      strokeWidthMils:
+        record instanceof AltiumTrackRecord || record instanceof AltiumArcRecord
+          ? (record.widthMils ?? 4)
+          : 0,
+    })
+  }
+
+  const courtyards: PcbCourtyardOutline[] = []
+  for (const path of stitchCourtyardPaths(paths)) {
+    if (!isClosedAltiumPath(path.points)) continue
+    const outline = removeClosingPoint(path.points).map(toMillimeterPoint)
+    if (outline.length < 3) continue
+    courtyards.push({
+      type: "pcb_courtyard_outline",
+      pcb_courtyard_outline_id: `pcb_courtyard_outline_altium_${courtyards.length}`,
+      pcb_component_id: path.componentId,
+      layer: path.layer,
+      outline,
+    })
+  }
+  return courtyards
+}
+
+function getCourtyardRecordPoints(record: AltiumRecord): AltiumPoint[] {
+  if (record instanceof AltiumTrackRecord) {
+    return record.start && record.end ? [record.start, record.end] : []
+  }
+  if (record instanceof AltiumArcRecord) {
+    return record.center && record.radiusMils
+      ? approximateArc(
+          record.center,
+          record.radiusMils,
+          record.startAngle,
+          record.endAngle,
+        )
+      : []
+  }
+  if (record instanceof AltiumRegionRecord) {
+    return getPcbRegionGeometry(record).outline.points
+  }
+  return []
+}
+
+function stitchCourtyardPaths(paths: CourtyardPath[]): CourtyardPath[] {
+  const groups = new Map<string, CourtyardPath[]>()
+  for (const path of deduplicateCourtyardPaths(paths)) {
+    const key = [
+      path.componentId,
+      path.layer,
+      path.strokeWidthMils.toFixed(4),
+    ].join("|")
+    const group = groups.get(key) ?? []
+    group.push(path)
+    groups.set(key, group)
+  }
+  return [...groups.values()].flatMap(stitchCourtyardPathGroup)
+}
+
+function stitchCourtyardPathGroup(group: CourtyardPath[]): CourtyardPath[] {
+  const remaining = [...group]
+  const stitched: CourtyardPath[] = []
+  while (remaining.length > 0) {
+    const first = remaining.shift()
+    if (!first) break
+    const path = { ...first, points: [...first.points] }
+    while (appendConnectedCourtyardPath(path, remaining)) {
+      // Continue until no segment can extend either end of this path.
+    }
+    stitched.push(path)
+  }
+  return stitched
+}
+
+function appendConnectedCourtyardPath(
+  stitched: CourtyardPath,
+  remaining: CourtyardPath[],
+): boolean {
+  const stitchedStart = stitched.points[0]
+  const stitchedEnd = stitched.points.at(-1)
+  if (!stitchedStart || !stitchedEnd) return false
+
+  for (const [index, candidate] of remaining.entries()) {
+    const candidateStart = candidate.points[0]
+    const candidateEnd = candidate.points.at(-1)
+    if (!candidateStart || !candidateEnd) continue
+    if (altiumPointsApproximatelyEqual(stitchedEnd, candidateStart)) {
+      stitched.points.push(...candidate.points.slice(1))
+    } else if (altiumPointsApproximatelyEqual(stitchedEnd, candidateEnd)) {
+      stitched.points.push(...candidate.points.toReversed().slice(1))
+    } else if (altiumPointsApproximatelyEqual(stitchedStart, candidateEnd)) {
+      stitched.points.unshift(...candidate.points.slice(0, -1))
+    } else if (altiumPointsApproximatelyEqual(stitchedStart, candidateStart)) {
+      stitched.points.unshift(...candidate.points.toReversed().slice(0, -1))
+    } else {
+      continue
+    }
+    remaining.splice(index, 1)
+    return true
+  }
+  return false
+}
+
+function deduplicateCourtyardPaths(paths: CourtyardPath[]): CourtyardPath[] {
+  const signatures = new Set<string>()
+  return paths.filter((path) => {
+    const forwardPoints = path.points.map(formatAltiumPoint).join("|")
+    const reversePoints = path.points
+      .toReversed()
+      .map(formatAltiumPoint)
+      .join("|")
+    const pointsSignature =
+      forwardPoints < reversePoints ? forwardPoints : reversePoints
+    const signature = [
+      path.componentId,
+      path.layer,
+      path.strokeWidthMils.toFixed(4),
+      pointsSignature,
+    ].join("|")
+    if (signatures.has(signature)) return false
+    signatures.add(signature)
+    return true
+  })
+}
+
+function formatAltiumPoint(point: AltiumPoint): string {
+  return `${point.x.toFixed(4)},${point.y.toFixed(4)}`
+}
+
+function isClosedAltiumPath(points: AltiumPoint[]): boolean {
+  const first = points[0]
+  const last = points.at(-1)
+  return Boolean(first && last && altiumPointsApproximatelyEqual(first, last))
+}
+
+function removeClosingPoint(points: AltiumPoint[]): AltiumPoint[] {
+  const first = points[0]
+  const last = points.at(-1)
+  return first && last && altiumPointsApproximatelyEqual(first, last)
+    ? points.slice(0, -1)
+    : points
+}
+
+function altiumPointsApproximatelyEqual(
+  left: AltiumPoint,
+  right: AltiumPoint,
+): boolean {
+  return (
+    Math.abs(left.x - right.x) <= 0.01 && Math.abs(left.y - right.y) <= 0.01
+  )
 }
 
 function createBoard(document: AltiumPcbDocument): PcbBoard {
@@ -564,6 +754,15 @@ function mapCopperLayer(layer: string | undefined): LayerRef | undefined {
 function isOverlayLayer(layer: string | undefined): boolean {
   const normalized = normalizeLayer(layer)
   return normalized === "TOPOVERLAY" || normalized === "BOTTOMOVERLAY"
+}
+
+function isCourtyardLayer(layer: string | undefined): boolean {
+  const normalized = normalizeLayer(layer)
+  return normalized === "MECHANICAL15" || normalized === "MECHANICAL16"
+}
+
+function mapCourtyardLayer(layer: string | undefined): "top" | "bottom" {
+  return normalizeLayer(layer) === "MECHANICAL16" ? "bottom" : "top"
 }
 
 function mapOverlayLayer(layer: string | undefined): "top" | "bottom" {
