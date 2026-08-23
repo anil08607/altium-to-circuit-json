@@ -13,7 +13,11 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,
-    "types": ["bun"]
+    "types": ["bun"],
+    "jsx": "react-jsx",
+    "baseUrl": ".",
+    "paths": { "@project-lib": ["./lib/index.ts"] }
   },
-  "include": ["lib", "scripts", "tests"]
+  "include": ["lib", "scripts", "tests", "site"],
+  "exclude": ["dist", "dist-site", "node_modules"]
 }
