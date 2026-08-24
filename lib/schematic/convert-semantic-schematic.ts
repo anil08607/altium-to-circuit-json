@@ -178,6 +178,14 @@ function convertComponents(params: {
         (!isPinHidden(record) || options.includeHidden === true),
     )
     if (pins.length === 0) continue
+    const visibleSymbolLabels = new Set(
+      visibleOwnedRecords
+        .filter((record) => record.recordKind === "4")
+        .flatMap((record) => {
+          const text = record.getDecoded("TEXT")?.trim().toUpperCase()
+          return text ? [text] : []
+        }),
+    )
 
     const designator =
       findOwnedText(ownedRecords, "34", "Designator") ??
@@ -226,6 +234,7 @@ function convertComponents(params: {
         pinIndex,
         schematicComponentId,
         sourceComponentId,
+        visibleSymbolLabels,
       }),
     )
     const bodyBounds = getComponentBodyBounds(
@@ -318,6 +327,7 @@ function convertComponentPin(params: {
   pinIndex: number
   schematicComponentId: string
   sourceComponentId: string
+  visibleSymbolLabels: Set<string>
 }): ConvertedPort {
   const {
     document,
@@ -326,6 +336,7 @@ function convertComponentPin(params: {
     pinIndex,
     schematicComponentId,
     sourceComponentId,
+    visibleSymbolLabels,
   } = params
   const recordIndex = document.records.indexOf(pin)
   const pinConglomerate = pin.getNumber("PINCONGLOMERATE")
@@ -356,10 +367,17 @@ function convertComponentPin(params: {
     ...(pinNumber === undefined ? {} : { pin_number: pinNumber }),
   }
   const electricalType = pin.getNumber("ELECTRICAL")
+  const normalizedName = name.trim().toUpperCase()
+  const functionalName = normalizedName.replace(/\d+$/u, "")
+  const showName =
+    pinConglomerate === undefined ||
+    (pinConglomerate & 0x08) !== 0 ||
+    visibleSymbolLabels.has(normalizedName) ||
+    visibleSymbolLabels.has(functionalName)
   const schematicPort: SchematicPort = {
     type: "schematic_port",
     center: scalePoint(terminalPoint, options.scale),
-    display_pin_label: name,
+    ...(showName && name ? { display_pin_label: name } : {}),
     distance_from_component_edge: pinLength * options.scale,
     facing_direction: direction,
     is_connected: false,

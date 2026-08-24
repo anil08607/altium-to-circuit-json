@@ -63,6 +63,39 @@ test("inline Altium net labels render as schematic text", () => {
   ).toBe(true)
 })
 
+test("inline net labels follow the Altium text orientation", () => {
+  const document = parseAltiumSchDoc(
+    [
+      "|RECORD=31|CUSTOMX=120|CUSTOMY=120|SIZE1=10|FONTNAME1=Arial",
+      "|RECORD=27|LOCATIONCOUNT=2|X1=50|Y1=10|X2=50|Y2=90",
+      "|RECORD=25|LOCATION.X=50|LOCATION.Y=30|TEXT=VERTICAL|ORIENTATION=1|FONTID=1|COLOR=128",
+      "|RECORD=27|LOCATIONCOUNT=2|X1=10|Y1=100|X2=90|Y2=100",
+      "|RECORD=25|LOCATION.X=30|LOCATION.Y=100|TEXT=HORIZONTAL|ORIENTATION=0|FONTID=1|COLOR=128",
+    ].join("\n"),
+  )
+  const schematicTexts = convertAltiumSchDocToCircuitJson(document, {
+    centerOnSchematicSheet: false,
+    schematicUnitScale: 0.1,
+  }).filter(
+    (element): element is SchematicText => element.type === "schematic_text",
+  )
+
+  expect(schematicTexts.find((text) => text.text === "VERTICAL")).toMatchObject(
+    {
+      anchor: "center",
+      rotation: -90,
+      source_trace_id: "source_trace_altium_0",
+    },
+  )
+  expect(
+    schematicTexts.find((text) => text.text === "HORIZONTAL"),
+  ).toMatchObject({
+    anchor: "center",
+    rotation: 0,
+    source_trace_id: "source_trace_altium_1",
+  })
+})
+
 test("sheet 12 preserves inline and anchored Altium labels independently", async () => {
   const source = await readReferenceBytes(
     `${TI_TMDS62LEVM_FIXTURE_NAME}/12.SchDoc`,
