@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react"
 import type { ChangeEvent, DragEvent } from "react"
 
 const runframeUrl =
-  "https://unpkg.com/@tscircuit/runframe@0.0.1799/dist/standalone-preview.min.js"
+  "https://unpkg.com/@tscircuit/runframe/dist/standalone-preview.min.js"
 const acceptedFileTypes = ".PcbDoc,.SchDoc"
 type InputKind = "pcb" | "schematic"
 
