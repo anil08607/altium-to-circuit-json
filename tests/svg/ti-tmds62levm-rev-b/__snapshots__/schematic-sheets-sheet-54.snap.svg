@@ -281,55 +281,55 @@
     L 473.48661602337864,443.3428849089561
     Z
   " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.482574363236px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_596__stack1" x="474.35524987720345" y="440.9300130927761" fill="rgb(132, 0, 0)" text-anchor="start" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="4.343169269123999px" transform="">XDS110_EMU1</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_598__stack1" d="
-    M 303.75511300981145,193.44316083229123
-    L 305.05806379054866,191.03028901611123
-    L 331.72512310297003,191.03028901611123
-    L 331.72512310297003,195.85603264847123
-    L 305.05806379054866,195.85603264847123
+    M 320.9416999723451,193.44316083229123
+    L 319.6387491916079,195.85603264847123
+    L 292.9716898791865,195.85603264847123
+    L 292.9716898791865,191.03028901611123
+    L 319.6387491916079,191.03028901611123
     Z
-  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.482574363236px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_598__stack1" x="305.92669764437346" y="193.44316083229123" fill="rgb(132, 0, 0)" text-anchor="start" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="4.343169269123999px" transform="">SoC_TRST#</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_600__stack1" d="
-    M 306.5049669238168,186.56852604727777
-    L 307.80791770455403,184.15565423109777
-    L 329.4497693144778,184.15565423109777
-    L 329.4497693144778,188.98139786345777
-    L 307.80791770455403,188.98139786345777
+  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.482574363236px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_598__stack1" x="318.77011533778307" y="193.44316083229123" fill="rgb(132, 0, 0)" text-anchor="end" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="4.343169269123999px" transform="">SoC_TRST#</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_600__stack1" d="
+    M 320.9416999723451,186.56852604727777
+    L 319.6387491916079,188.98139786345777
+    L 297.9968975816841,188.98139786345777
+    L 297.9968975816841,184.15565423109777
+    L 319.6387491916079,184.15565423109777
     Z
-  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.482574363236px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_600__stack1" x="308.67655155837883" y="186.56852604727777" fill="rgb(132, 0, 0)" text-anchor="start" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="4.343169269123999px" transform="">SoC_TCK</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_602__stack1" d="
-    M 306.5049669238168,190.00584343978448
-    L 307.80791770455403,187.59297162360448
-    L 329.93234367771385,187.59297162360448
-    L 329.93234367771385,192.41871525596449
-    L 307.80791770455403,192.41871525596449
+  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.482574363236px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_600__stack1" x="318.77011533778307" y="186.56852604727777" fill="rgb(132, 0, 0)" text-anchor="end" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="4.343169269123999px" transform="">SoC_TCK</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_602__stack1" d="
+    M 320.9416999723451,190.00584343978448
+    L 319.6387491916079,192.41871525596449
+    L 297.51432321844806,192.41871525596449
+    L 297.51432321844806,187.59297162360448
+    L 319.6387491916079,187.59297162360448
     Z
-  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.482574363236px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_602__stack1" x="308.67655155837883" y="190.00584343978448" fill="rgb(132, 0, 0)" text-anchor="start" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="4.343169269123999px" transform="">SoC_TMS</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_604__stack1" d="
-    M 306.5049669238168,183.131208654771
-    L 307.80791770455403,180.718336838591
-    L 328.00204622476986,180.718336838591
-    L 328.00204622476986,185.544080470951
-    L 307.80791770455403,185.544080470951
+  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.482574363236px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_602__stack1" x="318.77011533778307" y="190.00584343978448" fill="rgb(132, 0, 0)" text-anchor="end" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="4.343169269123999px" transform="">SoC_TMS</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_604__stack1" d="
+    M 320.9416999723451,183.131208654771
+    L 319.6387491916079,185.544080470951
+    L 299.44462067139204,185.544080470951
+    L 299.44462067139204,180.718336838591
+    L 319.6387491916079,180.718336838591
     Z
-  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.482574363236px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_604__stack1" x="308.67655155837883" y="183.131208654771" fill="rgb(132, 0, 0)" text-anchor="start" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="4.343169269123999px" transform="">SoC_TDI</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_606__stack1" d="
-    M 340.87814084888413,303.4373173925067
-    L 342.18109162962133,301.02444557632674
-    L 364.30551760278115,301.02444557632674
-    L 364.30551760278115,305.8501892086867
-    L 342.18109162962133,305.8501892086867
+  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.482574363236px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_604__stack1" x="318.77011533778307" y="183.131208654771" fill="rgb(132, 0, 0)" text-anchor="end" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="4.343169269123999px" transform="">SoC_TDI</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_606__stack1" d="
+    M 355.31487389741244,303.4373173925067
+    L 354.01192311667523,305.8501892086867
+    L 331.8874971435154,305.8501892086867
+    L 331.8874971435154,301.0244455763267
+    L 354.01192311667523,301.02444557632674
     Z
-  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.482574363236px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_606__stack1" x="343.04972548344614" y="303.4373173925067" fill="rgb(132, 0, 0)" text-anchor="start" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="4.343169269123999px" transform="">SoC_TDO</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_608__stack1" d="
-    M 332.628579106868,437.49269570026934
-    L 333.9315298876052,435.07982388408936
-    L 358.72941783309244,435.07982388408936
-    L 358.72941783309244,439.9055675164493
-    L 333.9315298876052,439.9055675164493
+  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.482574363236px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_606__stack1" x="353.14328926285043" y="303.4373173925067" fill="rgb(132, 0, 0)" text-anchor="end" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="4.343169269123999px" transform="">SoC_TDO</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_608__stack1" d="
+    M 348.44023911239896,437.49269570026934
+    L 347.13728833166175,439.9055675164493
+    L 322.33940038617453,439.9055675164493
+    L 322.33940038617453,435.0798238840893
+    L 347.13728833166175,435.07982388408936
     Z
-  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.482574363236px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_608__stack1" x="334.80016374143" y="437.49269570026934" fill="rgb(132, 0, 0)" text-anchor="start" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="4.343169269123999px" transform="">SoC_EMU0</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_610__stack1" d="
-    M 332.628579106868,440.9300130927761
-    L 333.9315298876052,438.51714127659613
-    L 358.72941783309244,438.51714127659613
-    L 358.72941783309244,443.3428849089561
-    L 333.9315298876052,443.3428849089561
+  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.482574363236px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_608__stack1" x="346.26865447783695" y="437.49269570026934" fill="rgb(132, 0, 0)" text-anchor="end" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="4.343169269123999px" transform="">SoC_EMU0</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_610__stack1" d="
+    M 348.44023911239896,440.9300130927761
+    L 347.13728833166175,443.3428849089561
+    L 322.33940038617453,443.3428849089561
+    L 322.33940038617453,438.5171412765961
+    L 347.13728833166175,438.51714127659613
     Z
-  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.482574363236px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_610__stack1" x="334.80016374143" y="440.9300130927761" fill="rgb(132, 0, 0)" text-anchor="start" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="4.343169269123999px" transform="">SoC_EMU1</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_612__stack1" d="
+  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.482574363236px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_610__stack1" x="346.26865447783695" y="440.9300130927761" fill="rgb(132, 0, 0)" text-anchor="end" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="4.343169269123999px" transform="">SoC_EMU1</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_612__stack1" d="
     M 465.30903045762796,176.25657386975752
     L 466.61198123836516,173.84370205357752
     L 488.25383284828894,173.84370205357752
@@ -337,19 +337,19 @@
     L 466.61198123836516,178.66944568593752
     Z
   " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.482574363236px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_612__stack1" x="467.48061509218996" y="176.25657386975752" fill="rgb(132, 0, 0)" text-anchor="start" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="4.343169269123999px" transform="">SEL_XDS</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_614__stack1" d="
-    M 316.1294556228357,451.2419652702963
-    L 317.4324064035729,448.82909345411633
-    L 365.5868935296825,448.82909345411633
-    L 365.5868935296825,453.6548370864763
-    L 317.4324064035729,453.6548370864763
+    M 348.44023911239896,451.2419652702963
+    L 347.13728833166175,453.6548370864763
+    L 298.9828012055521,453.6548370864763
+    L 298.9828012055521,448.8290934541163
+    L 347.13728833166175,448.82909345411633
     Z
-  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.482574363236px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_614__stack1" x="318.3010402573977" y="451.2419652702963" fill="rgb(132, 0, 0)" text-anchor="start" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="4.343169269123999px" transform="">SEL_XDS110_INV_1V8</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_635__stack1" d="
-    M 314.0670651873316,324.0612217475471
-    L 315.3700159680688,321.64834993136714
-    L 337.0118675779926,321.64834993136714
-    L 337.0118675779926,326.4740935637271
-    L 315.3700159680688,326.4740935637271
+  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.482574363236px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_614__stack1" x="346.26865447783695" y="451.2419652702963" fill="rgb(132, 0, 0)" text-anchor="end" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="4.343169269123999px" transform="">SEL_XDS110_INV_1V8</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_635__stack1" d="
+    M 355.31487389741244,324.0612217475471
+    L 354.01192311667523,326.4740935637271
+    L 332.37007150675146,326.4740935637271
+    L 332.37007150675146,321.6483499313671
+    L 354.01192311667523,321.64834993136714
     Z
-  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.482574363236px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_635__stack1" x="316.2386498218936" y="324.0612217475471" fill="rgb(132, 0, 0)" text-anchor="start" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="4.343169269123999px" transform="">SEL_XDS</text><text class="sch-text" x="340.100848809192" y="137.23964664409343" fill="rgb(132, 0, 0)" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="2.41287181618px" transform="rotate(0, 340.100848809192, 137.23964664409343)">XDS110_DIR</text><text class="sch-text" x="365.1865161330659" y="322.8547858394571" fill="rgb(132, 0, 0)" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="2.41287181618px" transform="rotate(0, 365.1865161330659, 322.8547858394571)">SEL_XDS</text><text class="sch-text" x="351.87755650490567" y="90.3236390570892" fill="#0000ff" text-anchor="start" dominant-baseline="ideographic" font-family="sans-serif" font-size="13.749269570026938px" transform="rotate(0, 351.87755650490567, 90.3236390570892)">XDS110 JTAG BUFFER</text><text class="sch-text" x="331.42551801949065" y="214.23893105695697" fill="#1f2937" text-anchor="start" dominant-baseline="hanging" font-family="sans-serif" font-size="5.499707828010775px" transform="rotate(0, 331.42551801949065, 214.23893105695697)">XDS110_DIR = H: A</text><text class="sch-text" x="331.42551801949065" y="219.7386388849677" fill="#1f2937" text-anchor="start" dominant-baseline="hanging" font-family="sans-serif" font-size="5.499707828010775px" transform="rotate(0, 331.42551801949065, 219.7386388849677)"><![CDATA[-> B]]></text><text class="sch-text" x="331.42551801949065" y="225.2383467129785" fill="#1f2937" text-anchor="start" dominant-baseline="hanging" font-family="sans-serif" font-size="5.499707828010775px" transform="rotate(0, 331.42551801949065, 225.2383467129785)">XDS110_DIR = L: B</text><text class="sch-text" x="637.1749000829647" y="547.8305839997355" fill="#1f2937" text-anchor="start" dominant-baseline="ideographic" font-family="sans-serif" font-size="4.82574363236px" transform="rotate(0, 637.1749000829647, 547.8305839997355)">PROC181E1-1</text>
+  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.482574363236px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_635__stack1" x="353.14328926285043" y="324.0612217475471" fill="rgb(132, 0, 0)" text-anchor="end" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="4.343169269123999px" transform="">SEL_XDS</text><text class="sch-text" x="340.100848809192" y="137.23964664409343" fill="rgb(132, 0, 0)" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="2.41287181618px" transform="rotate(0, 340.100848809192, 137.23964664409343)">XDS110_DIR</text><text class="sch-text" x="365.1865161330659" y="322.8547858394571" fill="rgb(132, 0, 0)" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="2.41287181618px" transform="rotate(0, 365.1865161330659, 322.8547858394571)">SEL_XDS</text><text class="sch-text" x="351.87755650490567" y="90.3236390570892" fill="#0000ff" text-anchor="start" dominant-baseline="ideographic" font-family="sans-serif" font-size="13.749269570026938px" transform="rotate(0, 351.87755650490567, 90.3236390570892)">XDS110 JTAG BUFFER</text><text class="sch-text" x="331.42551801949065" y="214.23893105695697" fill="#1f2937" text-anchor="start" dominant-baseline="hanging" font-family="sans-serif" font-size="5.499707828010775px" transform="rotate(0, 331.42551801949065, 214.23893105695697)">XDS110_DIR = H: A</text><text class="sch-text" x="331.42551801949065" y="219.7386388849677" fill="#1f2937" text-anchor="start" dominant-baseline="hanging" font-family="sans-serif" font-size="5.499707828010775px" transform="rotate(0, 331.42551801949065, 219.7386388849677)"><![CDATA[-> B]]></text><text class="sch-text" x="331.42551801949065" y="225.2383467129785" fill="#1f2937" text-anchor="start" dominant-baseline="hanging" font-family="sans-serif" font-size="5.499707828010775px" transform="rotate(0, 331.42551801949065, 225.2383467129785)">XDS110_DIR = L: B</text><text class="sch-text" x="637.1749000829647" y="547.8305839997355" fill="#1f2937" text-anchor="start" dominant-baseline="ideographic" font-family="sans-serif" font-size="4.82574363236px" transform="rotate(0, 637.1749000829647, 547.8305839997355)">PROC181E1-1</text>
   </g>
 </svg>

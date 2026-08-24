@@ -636,89 +636,89 @@
     L 665.9763900037557,398.6577588063685
     Z
   " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.482574363236px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1592__stack1" x="666.8450238575805" y="396.24488699018855" fill="rgb(132, 0, 0)" text-anchor="start" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="4.343169269123999px" transform="">WKUP_UART0_CTS_1V8</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1594__stack1" d="
-    M 109.20294859393022,207.19243040231817
-    L 110.50589937466742,204.77955858613817
-    L 173.6362775732009,204.77955858613817
-    L 173.6362775732009,209.60530221849817
-    L 110.50589937466742,209.60530221849817
+    M 149.07583034700838,207.19243040231817
+    L 147.77287956627117,209.60530221849817
+    L 84.64250136773768,209.60530221849817
+    L 84.64250136773768,204.77955858613817
+    L 147.77287956627117,204.77955858613817
     Z
-  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.482574363236px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1594__stack1" x="111.37453322849221" y="207.19243040231817" fill="rgb(132, 0, 0)" text-anchor="start" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="4.343169269123999px" transform="">FT4232_SOC_UART0_RX_3V3</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1596__stack1" d="
-    M 109.20294859393022,200.3177956173047
-    L 110.50589937466742,197.9049238011247
-    L 173.3145613310436,197.9049238011247
-    L 173.3145613310436,202.7306674334847
-    L 110.50589937466742,202.7306674334847
+  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.482574363236px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1594__stack1" x="146.90424571244637" y="207.19243040231817" fill="rgb(132, 0, 0)" text-anchor="end" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="4.343169269123999px" transform="">FT4232_SOC_UART0_RX_3V3</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1596__stack1" d="
+    M 149.07583034700838,200.3177956173047
+    L 147.77287956627117,202.7306674334847
+    L 84.964217609895,202.7306674334847
+    L 84.964217609895,197.9049238011247
+    L 147.77287956627117,197.9049238011247
     Z
-  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.482574363236px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1596__stack1" x="111.37453322849221" y="200.3177956173047" fill="rgb(132, 0, 0)" text-anchor="start" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="4.343169269123999px" transform="">FT4232_SOC_UART0_TX_3V3</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1598__stack1" d="
-    M 439.18541827457676,207.19243040231817
-    L 440.48836905531397,204.77955858613817
-    L 503.61874725384746,204.77955858613817
-    L 503.61874725384746,209.60530221849817
-    L 440.48836905531397,209.60530221849817
+  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.482574363236px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1596__stack1" x="146.90424571244637" y="200.3177956173047" fill="rgb(132, 0, 0)" text-anchor="end" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="4.343169269123999px" transform="">FT4232_SOC_UART0_TX_3V3</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1598__stack1" d="
+    M 479.05830002765487,207.19243040231817
+    L 477.75534924691766,209.60530221849817
+    L 414.62497104838417,209.60530221849817
+    L 414.62497104838417,204.77955858613817
+    L 477.75534924691766,204.77955858613817
     Z
-  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.482574363236px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1598__stack1" x="441.35700290913877" y="207.19243040231817" fill="rgb(132, 0, 0)" text-anchor="start" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="4.343169269123999px" transform="">FT4232_SOC_UART4_RX_3V3</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1600__stack1" d="
-    M 439.18541827457676,200.3177956173047
-    L 440.48836905531397,197.9049238011247
-    L 503.29703101169014,197.9049238011247
-    L 503.29703101169014,202.7306674334847
-    L 440.48836905531397,202.7306674334847
+  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.482574363236px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1598__stack1" x="476.88671539309286" y="207.19243040231817" fill="rgb(132, 0, 0)" text-anchor="end" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="4.343169269123999px" transform="">FT4232_SOC_UART4_RX_3V3</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1600__stack1" d="
+    M 479.05830002765487,200.3177956173047
+    L 477.75534924691766,202.7306674334847
+    L 414.9466872905415,202.7306674334847
+    L 414.9466872905415,197.9049238011247
+    L 477.75534924691766,197.9049238011247
     Z
-  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.482574363236px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1600__stack1" x="441.35700290913877" y="200.3177956173047" fill="rgb(132, 0, 0)" text-anchor="start" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="4.343169269123999px" transform="">FT4232_SOC_UART4_TX_3V3</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1602__stack1" d="
-    M 430.24839305405925,385.93293481266835
-    L 431.55134383479646,383.5200629964884
-    L 497.8377583688934,383.5200629964884
-    L 497.8377583688934,388.3458066288483
-    L 431.55134383479646,388.3458066288483
+  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.482574363236px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1600__stack1" x="476.88671539309286" y="200.3177956173047" fill="rgb(132, 0, 0)" text-anchor="end" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="4.343169269123999px" transform="">FT4232_SOC_UART4_TX_3V3</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1602__stack1" d="
+    M 472.18366524264144,385.93293481266835
+    L 470.88071446190423,388.3458066288483
+    L 404.5942999278073,388.3458066288483
+    L 404.5942999278073,383.5200629964883
+    L 470.88071446190423,383.5200629964884
     Z
-  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.482574363236px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1602__stack1" x="432.41997768862126" y="385.93293481266835" fill="rgb(132, 0, 0)" text-anchor="start" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="4.343169269123999px" transform="">FT4232_WKUP_UART0_TX_3V3</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1604__stack1" d="
-    M 428.87346609705656,389.37025220517506
-    L 430.17641687779377,386.9573803889951
-    L 499.4580096263755,386.9573803889951
-    L 499.4580096263755,391.78312402135504
-    L 430.17641687779377,391.78312402135504
+  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.482574363236px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1602__stack1" x="470.01208060807943" y="385.93293481266835" fill="rgb(132, 0, 0)" text-anchor="end" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="4.343169269123999px" transform="">FT4232_WKUP_UART0_TX_3V3</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1604__stack1" d="
+    M 472.18366524264144,389.37025220517506
+    L 470.88071446190423,391.78312402135504
+    L 401.5991217133225,391.78312402135504
+    L 401.5991217133225,386.95738038899503
+    L 470.88071446190423,386.9573803889951
     Z
-  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.482574363236px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1604__stack1" x="431.0450507316186" y="389.37025220517506" fill="rgb(132, 0, 0)" text-anchor="start" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="4.343169269123999px" transform="">FT4232_WKUP_UART0_RTS_3V3</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1606__stack1" d="
-    M 430.24839305405925,392.80756959768183
-    L 431.55134383479646,390.39469778150186
-    L 498.1594746110507,390.39469778150186
-    L 498.1594746110507,395.2204414138618
-    L 431.55134383479646,395.2204414138618
+  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.482574363236px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1604__stack1" x="470.01208060807943" y="389.37025220517506" fill="rgb(132, 0, 0)" text-anchor="end" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="4.343169269123999px" transform="">FT4232_WKUP_UART0_RTS_3V3</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1606__stack1" d="
+    M 472.18366524264144,392.80756959768183
+    L 470.88071446190423,395.2204414138618
+    L 404.27258368565,395.2204414138618
+    L 404.27258368565,390.3946977815018
+    L 470.88071446190423,390.39469778150186
     Z
-  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.482574363236px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1606__stack1" x="432.41997768862126" y="392.80756959768183" fill="rgb(132, 0, 0)" text-anchor="start" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="4.343169269123999px" transform="">FT4232_WKUP_UART0_RX_3V3</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1608__stack1" d="
-    M 428.87346609705656,396.24488699018855
-    L 430.17641687779377,393.8320151740086
-    L 499.4580096263755,393.8320151740086
-    L 499.4580096263755,398.6577588063685
-    L 430.17641687779377,398.6577588063685
+  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.482574363236px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1606__stack1" x="470.01208060807943" y="392.80756959768183" fill="rgb(132, 0, 0)" text-anchor="end" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="4.343169269123999px" transform="">FT4232_WKUP_UART0_RX_3V3</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1608__stack1" d="
+    M 472.18366524264144,396.24488699018855
+    L 470.88071446190423,398.6577588063685
+    L 401.5991217133225,398.6577588063685
+    L 401.5991217133225,393.8320151740085
+    L 470.88071446190423,393.8320151740086
     Z
-  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.482574363236px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1608__stack1" x="431.0450507316186" y="396.24488699018855" fill="rgb(132, 0, 0)" text-anchor="start" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="4.343169269123999px" transform="">FT4232_WKUP_UART0_CTS_3V3</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1610__stack1" d="
-    M 109.20294859393022,385.93293481266835
-    L 110.50589937466742,383.5200629964884
-    L 173.3145613310436,383.5200629964884
-    L 173.3145613310436,388.3458066288483
-    L 110.50589937466742,388.3458066288483
+  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.482574363236px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1608__stack1" x="470.01208060807943" y="396.24488699018855" fill="rgb(132, 0, 0)" text-anchor="end" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="4.343169269123999px" transform="">FT4232_WKUP_UART0_CTS_3V3</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1610__stack1" d="
+    M 149.07583034700838,385.93293481266835
+    L 147.77287956627117,388.3458066288483
+    L 84.964217609895,388.3458066288483
+    L 84.964217609895,383.5200629964883
+    L 147.77287956627117,383.5200629964884
     Z
-  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.482574363236px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1610__stack1" x="111.37453322849221" y="385.93293481266835" fill="rgb(132, 0, 0)" text-anchor="start" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="4.343169269123999px" transform="">FT4232_SOC_UART1_TX_3V3</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1612__stack1" d="
-    M 107.14055815842624,389.37025220517506
-    L 108.44350893916345,386.9573803889951
-    L 174.2473491100244,386.9573803889951
-    L 174.2473491100244,391.78312402135504
-    L 108.44350893916345,391.78312402135504
+  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.482574363236px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1610__stack1" x="146.90424571244637" y="385.93293481266835" fill="rgb(132, 0, 0)" text-anchor="end" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="4.343169269123999px" transform="">FT4232_SOC_UART1_TX_3V3</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1612__stack1" d="
+    M 149.07583034700838,389.37025220517506
+    L 147.77287956627117,391.78312402135504
+    L 81.96903939541023,391.78312402135504
+    L 81.96903939541023,386.95738038899503
+    L 147.77287956627117,386.9573803889951
     Z
-  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.482574363236px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1612__stack1" x="109.31214279298824" y="389.37025220517506" fill="rgb(132, 0, 0)" text-anchor="start" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="4.343169269123999px" transform="">FT4232_SOC_UART1_RTS_3V3</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1614__stack1" d="
-    M 109.20294859393022,392.80756959768183
-    L 110.50589937466742,390.39469778150186
-    L 173.6362775732009,390.39469778150186
-    L 173.6362775732009,395.2204414138618
-    L 110.50589937466742,395.2204414138618
+  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.482574363236px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1612__stack1" x="146.90424571244637" y="389.37025220517506" fill="rgb(132, 0, 0)" text-anchor="end" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="4.343169269123999px" transform="">FT4232_SOC_UART1_RTS_3V3</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1614__stack1" d="
+    M 149.07583034700838,392.80756959768183
+    L 147.77287956627117,395.2204414138618
+    L 84.64250136773768,395.2204414138618
+    L 84.64250136773768,390.3946977815018
+    L 147.77287956627117,390.39469778150186
     Z
-  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.482574363236px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1614__stack1" x="111.37453322849221" y="392.80756959768183" fill="rgb(132, 0, 0)" text-anchor="start" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="4.343169269123999px" transform="">FT4232_SOC_UART1_RX_3V3</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1616__stack1" d="
-    M 107.14055815842624,396.24488699018855
-    L 108.44350893916345,393.8320151740086
-    L 174.2473491100244,393.8320151740086
-    L 174.2473491100244,398.6577588063685
-    L 108.44350893916345,398.6577588063685
+  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.482574363236px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1614__stack1" x="146.90424571244637" y="392.80756959768183" fill="rgb(132, 0, 0)" text-anchor="end" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="4.343169269123999px" transform="">FT4232_SOC_UART1_RX_3V3</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1616__stack1" d="
+    M 149.07583034700838,396.24488699018855
+    L 147.77287956627117,398.6577588063685
+    L 81.96903939541023,398.6577588063685
+    L 81.96903939541023,393.8320151740085
+    L 147.77287956627117,393.8320151740086
     Z
-  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.482574363236px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1616__stack1" x="109.31214279298824" y="396.24488699018855" fill="rgb(132, 0, 0)" text-anchor="start" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="4.343169269123999px" transform="">FT4232_SOC_UART1_CTS_3V3</text><text class="sch-text" x="637.1749000829647" y="547.8305839997355" fill="#1f2937" text-anchor="start" dominant-baseline="ideographic" font-family="sans-serif" font-size="4.82574363236px" transform="rotate(0, 637.1749000829647, 547.8305839997355)">PROC181E1-1</text><text class="sch-text" x="322.83222453822384" y="410.16602242984084" fill="#1f2937" text-anchor="start" dominant-baseline="hanging" font-family="sans-serif" font-size="4.82574363236px" transform="rotate(0, 322.83222453822384, 410.16602242984084)">SILK SCREEN :</text><text class="sch-text" x="322.83222453822384" y="413.2596080830969" fill="#1f2937" text-anchor="start" dominant-baseline="hanging" font-family="sans-serif" font-size="4.82574363236px" transform="rotate(0, 322.83222453822384, 413.2596080830969)">SOC_UART1</text><text class="sch-text" x="322.83222453822384" y="416.3531937363529" fill="#1f2937" text-anchor="start" dominant-baseline="hanging" font-family="sans-serif" font-size="4.82574363236px" transform="rotate(0, 322.83222453822384, 416.3531937363529)">TXD</text><text class="sch-text" x="322.83222453822384" y="419.446779389609" fill="#1f2937" text-anchor="start" dominant-baseline="hanging" font-family="sans-serif" font-size="4.82574363236px" transform="rotate(0, 322.83222453822384, 419.446779389609)">RTS</text><text class="sch-text" x="322.83222453822384" y="422.54036504286506" fill="#1f2937" text-anchor="start" dominant-baseline="hanging" font-family="sans-serif" font-size="4.82574363236px" transform="rotate(0, 322.83222453822384, 422.54036504286506)">RXD</text><text class="sch-text" x="338.12828693487876" y="104.07290862711613" fill="#0000ff" text-anchor="start" dominant-baseline="ideographic" font-family="sans-serif" font-size="13.749269570026938px" transform="rotate(0, 338.12828693487876, 104.07290862711613)">FT4232 UART BUFFERS</text>
+  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.482574363236px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1616__stack1" x="146.90424571244637" y="396.24488699018855" fill="rgb(132, 0, 0)" text-anchor="end" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="4.343169269123999px" transform="">FT4232_SOC_UART1_CTS_3V3</text><text class="sch-text" x="637.1749000829647" y="547.8305839997355" fill="#1f2937" text-anchor="start" dominant-baseline="ideographic" font-family="sans-serif" font-size="4.82574363236px" transform="rotate(0, 637.1749000829647, 547.8305839997355)">PROC181E1-1</text><text class="sch-text" x="322.83222453822384" y="410.16602242984084" fill="#1f2937" text-anchor="start" dominant-baseline="hanging" font-family="sans-serif" font-size="4.82574363236px" transform="rotate(0, 322.83222453822384, 410.16602242984084)">SILK SCREEN :</text><text class="sch-text" x="322.83222453822384" y="413.2596080830969" fill="#1f2937" text-anchor="start" dominant-baseline="hanging" font-family="sans-serif" font-size="4.82574363236px" transform="rotate(0, 322.83222453822384, 413.2596080830969)">SOC_UART1</text><text class="sch-text" x="322.83222453822384" y="416.3531937363529" fill="#1f2937" text-anchor="start" dominant-baseline="hanging" font-family="sans-serif" font-size="4.82574363236px" transform="rotate(0, 322.83222453822384, 416.3531937363529)">TXD</text><text class="sch-text" x="322.83222453822384" y="419.446779389609" fill="#1f2937" text-anchor="start" dominant-baseline="hanging" font-family="sans-serif" font-size="4.82574363236px" transform="rotate(0, 322.83222453822384, 419.446779389609)">RTS</text><text class="sch-text" x="322.83222453822384" y="422.54036504286506" fill="#1f2937" text-anchor="start" dominant-baseline="hanging" font-family="sans-serif" font-size="4.82574363236px" transform="rotate(0, 322.83222453822384, 422.54036504286506)">RXD</text><text class="sch-text" x="338.12828693487876" y="104.07290862711613" fill="#0000ff" text-anchor="start" dominant-baseline="ideographic" font-family="sans-serif" font-size="13.749269570026938px" transform="rotate(0, 338.12828693487876, 104.07290862711613)">FT4232 UART BUFFERS</text>
   </g>
 </svg>

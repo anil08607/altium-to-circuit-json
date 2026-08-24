@@ -467,13 +467,13 @@
     L 646.8318666876911,399.1152374200252
     Z
   " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.43893364636000004px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_4090__stack1" x="647.6219472511391" y="396.9205691882252" fill="rgb(132, 0, 0)" text-anchor="start" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="3.95040281724px" transform="">UART1_RXD</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_4092__stack1" d="
-    M 182.92918971808882,181.1941409950787
-    L 184.11431056326083,178.9994727632787
-    L 219.12073197262535,178.9994727632787
-    L 219.12073197262535,183.3888092268787
-    L 184.11431056326083,183.3888092268787
+    M 204.81447953478485,181.1941409950787
+    L 203.62935868961284,183.3888092268787
+    L 168.62293728024832,183.3888092268787
+    L 168.62293728024832,178.9994727632787
+    L 203.62935868961284,178.9994727632787
     Z
-  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.43893364636000004px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_4092__stack1" x="184.90439112670882" y="181.1941409950787" fill="rgb(132, 0, 0)" text-anchor="start" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="3.95040281724px" transform="">MAIN_MCAN2_RX</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_4096__stack1" d="
+  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.43893364636000004px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_4092__stack1" x="202.83927812616486" y="181.1941409950787" fill="rgb(132, 0, 0)" text-anchor="end" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="3.95040281724px" transform="">MAIN_MCAN2_RX</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_4096__stack1" d="
     M 370.5173881469119,184.32061096889248
     L 371.7025089920839,182.1259427370925
     L 401.4973249070007,182.1259427370925
@@ -481,20 +481,20 @@
     L 371.7025089920839,186.51527920069248
     Z
   " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.43893364636000004px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_4096__stack1" x="372.49258955553194" y="184.32061096889248" fill="rgb(132, 0, 0)" text-anchor="start" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="3.95040281724px" transform="">SoC_I2C0_SCL</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_4098__stack1" d="
-    M 182.92918971808882,187.44708094270612
-    L 184.11431056326083,185.25241271090613
-    L 218.82810954171867,185.25241271090613
-    L 218.82810954171867,189.64174917450612
-    L 184.11431056326083,189.64174917450612
+    M 204.81447953478485,187.44708094270612
+    L 203.62935868961284,189.64174917450612
+    L 168.91555971115497,189.64174917450612
+    L 168.91555971115497,185.25241271090613
+    L 203.62935868961284,185.25241271090613
     Z
-  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.43893364636000004px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_4098__stack1" x="184.90439112670882" y="187.44708094270612" fill="rgb(132, 0, 0)" text-anchor="start" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="3.95040281724px" transform="">MAIN_MCAN2_TX</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_4102__stack1" d="
-    M 178.5521317547496,193.70002089033358
-    L 179.73725259992162,191.50535265853358
-    L 221.59981756542933,191.50535265853358
-    L 221.59981756542933,195.89468912213357
-    L 179.73725259992162,195.89468912213357
+  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.43893364636000004px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_4098__stack1" x="202.83927812616486" y="187.44708094270612" fill="rgb(132, 0, 0)" text-anchor="end" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="3.95040281724px" transform="">MAIN_MCAN2_TX</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_4102__stack1" d="
+    M 204.81447953478485,193.70002089033358
+    L 203.62935868961284,195.89468912213357
+    L 161.76679372410513,195.89468912213357
+    L 161.76679372410513,191.50535265853358
+    L 203.62935868961284,191.50535265853358
     Z
-  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.43893364636000004px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_4102__stack1" x="180.5273331633696" y="193.70002089033358" fill="rgb(132, 0, 0)" text-anchor="start" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="3.95040281724px" transform="">SOC_UART0_RX_3V3</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_4104__stack1" d="
+  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.43893364636000004px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_4102__stack1" x="202.83927812616486" y="193.70002089033358" fill="rgb(132, 0, 0)" text-anchor="end" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="3.95040281724px" transform="">SOC_UART0_RX_3V3</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_4104__stack1" d="
     M 370.5173881469119,193.70002089033358
     L 371.7025089920839,191.50535265853358
     L 401.4973249070007,191.50535265853358
@@ -502,13 +502,13 @@
     L 371.7025089920839,195.89468912213357
     Z
   " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.43893364636000004px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_4104__stack1" x="372.49258955553194" y="193.70002089033358" fill="rgb(132, 0, 0)" text-anchor="start" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="3.95040281724px" transform="">SoC_I2C1_SCL</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_4106__stack1" d="
-    M 178.5521317547496,196.82649086414733
-    L 179.73725259992162,194.63182263234734
-    L 221.3071951345227,194.63182263234734
-    L 221.3071951345227,199.02115909594733
-    L 179.73725259992162,199.02115909594733
+    M 204.81447953478485,196.82649086414733
+    L 203.62935868961284,199.02115909594733
+    L 162.05941615501177,199.02115909594733
+    L 162.05941615501177,194.63182263234734
+    L 203.62935868961284,194.63182263234734
     Z
-  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.43893364636000004px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_4106__stack1" x="180.5273331633696" y="196.82649086414733" fill="rgb(132, 0, 0)" text-anchor="start" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="3.95040281724px" transform="">SOC_UART0_TX_3V3</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_4108__stack1" d="
+  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.43893364636000004px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_4106__stack1" x="202.83927812616486" y="196.82649086414733" fill="rgb(132, 0, 0)" text-anchor="end" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="3.95040281724px" transform="">SOC_UART0_TX_3V3</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_4108__stack1" d="
     M 533.0938267852252,149.92944125694154
     L 534.2789476303973,147.73477302514155
     L 564.5126971916741,147.73477302514155
@@ -516,13 +516,13 @@
     L 534.2789476303973,152.12410948874154
     Z
   " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.43893364636000004px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_4108__stack1" x="535.0690281938453" y="149.92944125694154" fill="rgb(132, 0, 0)" text-anchor="start" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="3.95040281724px" transform="">SoC_I2C2_SDA</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_4110__stack1" d="
-    M 186.05565969190258,203.07943081177476
-    L 187.24078053707458,200.88476257997476
-    L 217.09119471386364,200.88476257997476
-    L 217.09119471386364,205.27409904357475
-    L 187.24078053707458,205.27409904357475
+    M 204.81447953478485,203.07943081177476
+    L 203.62935868961284,205.27409904357475
+    L 173.77894451282378,205.27409904357475
+    L 173.77894451282378,200.88476257997476
+    L 203.62935868961284,200.88476257997476
     Z
-  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.43893364636000004px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_4110__stack1" x="188.03086110052257" y="203.07943081177476" fill="rgb(132, 0, 0)" text-anchor="start" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="3.95040281724px" transform="">EXT_CLKOUT0</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_4112__stack1" d="
+  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.43893364636000004px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_4110__stack1" x="202.83927812616486" y="203.07943081177476" fill="rgb(132, 0, 0)" text-anchor="end" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="3.95040281724px" transform="">EXT_CLKOUT0</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_4112__stack1" d="
     M 533.0938267852252,178.067671021265
     L 534.2789476303973,175.873002789465
     L 564.073763545314,175.873002789465
@@ -530,20 +530,20 @@
     L 534.2789476303973,180.262339253065
     Z
   " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.43893364636000004px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_4112__stack1" x="535.0690281938453" y="178.067671021265" fill="rgb(132, 0, 0)" text-anchor="start" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="3.95040281724px" transform="">SoC_I2C2_SCL</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_4114__stack1" d="
-    M 182.92918971808882,209.33237075940218
-    L 184.11431056326083,207.1377025276022
-    L 219.12073197262535,207.1377025276022
-    L 219.12073197262535,211.52703899120218
-    L 184.11431056326083,211.52703899120218
+    M 204.81447953478485,209.33237075940218
+    L 203.62935868961284,211.52703899120218
+    L 168.62293728024832,211.52703899120218
+    L 168.62293728024832,207.1377025276022
+    L 203.62935868961284,207.1377025276022
     Z
-  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.43893364636000004px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_4114__stack1" x="184.90439112670882" y="209.33237075940218" fill="rgb(132, 0, 0)" text-anchor="start" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="3.95040281724px" transform="">MAIN_MCAN0_RX</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_4116__stack1" d="
-    M 182.92918971808882,212.45884073321588
-    L 184.11431056326083,210.26417250141589
-    L 218.82810954171867,210.26417250141589
-    L 218.82810954171867,214.65350896501587
-    L 184.11431056326083,214.65350896501587
+  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.43893364636000004px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_4114__stack1" x="202.83927812616486" y="209.33237075940218" fill="rgb(132, 0, 0)" text-anchor="end" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="3.95040281724px" transform="">MAIN_MCAN0_RX</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_4116__stack1" d="
+    M 204.81447953478485,212.45884073321588
+    L 203.62935868961284,214.65350896501587
+    L 168.91555971115497,214.65350896501587
+    L 168.91555971115497,210.26417250141589
+    L 203.62935868961284,210.26417250141589
     Z
-  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.43893364636000004px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_4116__stack1" x="184.90439112670882" y="212.45884073321588" fill="rgb(132, 0, 0)" text-anchor="start" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="3.95040281724px" transform="">MAIN_MCAN0_TX</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_4118__stack1" d="
+  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.43893364636000004px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_4116__stack1" x="202.83927812616486" y="212.45884073321588" fill="rgb(132, 0, 0)" text-anchor="end" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="3.95040281724px" transform="">MAIN_MCAN0_TX</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_4118__stack1" d="
     M 373.6438581207256,215.58531070702963
     L 374.8289789658976,213.39064247522964
     L 406.3239312043821,213.39064247522964
