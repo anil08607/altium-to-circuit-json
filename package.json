@@ -44,7 +44,7 @@
   },
   "dependencies": {
     "altiumts": "^0.0.26",
-    "circuit-json": "^0.0.456",
+    "circuit-json": "^0.0.475",
     "format-si-unit": "^0.0.11",
     "schematic-symbols": "^0.0.238"
   },

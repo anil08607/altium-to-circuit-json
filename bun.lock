@@ -6,7 +6,7 @@
       "name": "altium-to-circuit-json",
       "dependencies": {
         "altiumts": "^0.0.26",
-        "circuit-json": "^0.0.456",
+        "circuit-json": "^0.0.475",
         "format-si-unit": "^0.0.11",
         "schematic-symbols": "^0.0.238",
       },
@@ -501,7 +501,7 @@
 
     "chownr": ["chownr@3.0.0", "", {}, "sha512-+IxzY9BZOQd/XuYPRmrvEVjF/nqj5kgT4kEq7VofrDoM1MxoRjEWkrCC3EtLi59TVawxTAn+orJwFQcrqEN1+g=="],
 
-    "circuit-json": ["circuit-json@0.0.456", "", { "peerDependencies": { "format-si-unit": "*" } }, "sha512-iqcNnSxr1IOIwB3voMMcylrf1sVq3pQs/EJXeOtPBhdLOVVbe8eo5rXY39LE9535T2ywFv6l8tK1LM630y9JPg=="],
+    "circuit-json": ["circuit-json@0.0.475", "", { "peerDependencies": { "format-si-unit": "*" } }, "sha512-3IdJVd7JbxmCP+zxJVXbl4aeNCdKG8YB6kp0HSvvL2w9qEKUUNCegbIqUypWMfByBehBV28MhsjLwjiNurlFnA=="],
 
     "circuit-json-to-connectivity-map": ["circuit-json-to-connectivity-map@0.0.25", "", { "dependencies": { "@tscircuit/math-utils": "^0.0.9" }, "peerDependencies": { "typescript": "^5.9.3" } }, "sha512-6UhBtJX83HcGGzRr7DvyiidTYLXQCPEiftoyqH/YX4ZSuTyg/jP9DOpScMgi0Dq/SdYp6G1MzmOQNwvppw99eA=="],
 

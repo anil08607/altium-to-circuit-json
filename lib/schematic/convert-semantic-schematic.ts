@@ -100,6 +100,11 @@ const CARDINAL_DIRECTIONS: readonly CardinalDirection[] = [
 
 const SYMBOL_CATALOG = symbols as Record<string, SchSymbol | undefined>
 const SYMBOL_NAMES = Object.keys(SYMBOL_CATALOG)
+const INLINE_NET_LABEL_COLOR = "rgb(132, 0, 0)"
+const DEFAULT_INLINE_NET_LABEL_FONT_SIZE = 0.18
+const MIN_INLINE_NET_LABEL_FONT_SIZE = 0.1
+const INLINE_NET_LABEL_CHARACTER_WIDTH = 0.12
+const INLINE_NET_LABEL_HORIZONTAL_PADDING = 0.12
 
 /**
  * Converts records that have native Circuit JSON semantics before the
@@ -173,6 +178,14 @@ function convertComponents(params: {
         (!isPinHidden(record) || options.includeHidden === true),
     )
     if (pins.length === 0) continue
+    const visibleSymbolLabels = new Set(
+      visibleOwnedRecords
+        .filter((record) => record.recordKind === "4")
+        .flatMap((record) => {
+          const text = record.getDecoded("TEXT")?.trim().toUpperCase()
+          return text ? [text] : []
+        }),
+    )
 
     const designator =
       findOwnedText(ownedRecords, "34", "Designator") ??
@@ -221,6 +234,7 @@ function convertComponents(params: {
         pinIndex,
         schematicComponentId,
         sourceComponentId,
+        visibleSymbolLabels,
       }),
     )
     const bodyBounds = getComponentBodyBounds(
@@ -313,6 +327,7 @@ function convertComponentPin(params: {
   pinIndex: number
   schematicComponentId: string
   sourceComponentId: string
+  visibleSymbolLabels: Set<string>
 }): ConvertedPort {
   const {
     document,
@@ -321,6 +336,7 @@ function convertComponentPin(params: {
     pinIndex,
     schematicComponentId,
     sourceComponentId,
+    visibleSymbolLabels,
   } = params
   const recordIndex = document.records.indexOf(pin)
   const pinConglomerate = pin.getNumber("PINCONGLOMERATE")
@@ -351,10 +367,17 @@ function convertComponentPin(params: {
     ...(pinNumber === undefined ? {} : { pin_number: pinNumber }),
   }
   const electricalType = pin.getNumber("ELECTRICAL")
+  const normalizedName = name.trim().toUpperCase()
+  const functionalName = normalizedName.replace(/\d+$/u, "")
+  const showName =
+    pinConglomerate === undefined ||
+    (pinConglomerate & 0x08) !== 0 ||
+    visibleSymbolLabels.has(normalizedName) ||
+    visibleSymbolLabels.has(functionalName)
   const schematicPort: SchematicPort = {
     type: "schematic_port",
     center: scalePoint(terminalPoint, options.scale),
-    display_pin_label: name,
+    ...(showName && name ? { display_pin_label: name } : {}),
     distance_from_component_edge: pinLength * options.scale,
     facing_direction: direction,
     is_connected: false,
@@ -744,6 +767,8 @@ class PointDisjointSet {
 interface ConnectivityConversion {
   sourceNetIdByRecord: Map<AltiumRecord, string>
   sourceNetIdByName: Map<string, string>
+  sourcePortCountByRecord: Map<AltiumRecord, number>
+  sourceTraceIdByRecord: Map<AltiumRecord, string>
   schematicTraceIdByRecord: Map<AltiumRecord, string>
 }
 
@@ -765,6 +790,8 @@ function convertConnectivity(params: {
   } = params
   const sourceNetIdByName = new Map<string, string>()
   const sourceNetIdByRecord = new Map<AltiumRecord, string>()
+  const sourcePortCountByRecord = new Map<AltiumRecord, number>()
+  const sourceTraceIdByRecord = new Map<AltiumRecord, string>()
   const schematicTraceIdByRecord = new Map<AltiumRecord, string>()
   const portsByPoint = groupByPoint(convertedPorts)
 
@@ -798,6 +825,10 @@ function convertConnectivity(params: {
     }
 
     const sourceTraceId = `source_trace_altium_${netIndex}`
+    for (const record of net.records) {
+      sourcePortCountByRecord.set(record, connectedPorts.length)
+      sourceTraceIdByRecord.set(record, sourceTraceId)
+    }
     const sourceTrace: SourceTrace = {
       type: "source_trace",
       connected_source_net_ids: sourceNetIds,
@@ -917,6 +948,8 @@ function convertConnectivity(params: {
     schematicTraceIdByRecord,
     sourceNetIdByName,
     sourceNetIdByRecord,
+    sourcePortCountByRecord,
+    sourceTraceIdByRecord,
   }
 }
 
@@ -1073,10 +1106,35 @@ function convertNetLabels(params: {
         : record.getDecoded("TEXT")
     const location = getLocation(record)
     if (!name || !location) continue
-    const wire = graph.getConnectedWiresForRecord(record)[0]
+    const connectedWires = graph.getConnectedWiresForRecord(record)
+    const wire = connectedWires[0]
     // Altium's generic label record is also used for page titles and notes.
     // It is only an electrical net label when it touches a wire.
     if (recordKind === "4" && !wire) continue
+    const sourceTraceId = connectivity.sourceTraceIdByRecord.get(record)
+    const shouldRenderInline =
+      Boolean(sourceTraceId) &&
+      (recordKind === "25" ||
+        (recordKind === "18" &&
+          (record.getNumber("IOTYPE") ?? 0) === 0 &&
+          connectivity.sourcePortCountByRecord.get(record) === 2 &&
+          !isPowerNet(name)))
+    if (shouldRenderInline && sourceTraceId) {
+      handledRecords.add(record)
+      elements.push(
+        createInlineNetLabelText({
+          connectedWires,
+          document,
+          location,
+          name,
+          options,
+          record,
+          recordIndex,
+          sourceTraceId,
+        }),
+      )
+      continue
+    }
     handledRecords.add(record)
 
     const sourceNetId =
@@ -1111,6 +1169,130 @@ function convertNetLabels(params: {
     }
     elements.push(schematicNetLabel)
   }
+}
+
+function createInlineNetLabelText(params: {
+  connectedWires: AltiumRecord[]
+  document: AltiumSchDoc
+  location: AltiumPoint
+  name: string
+  options: SemanticSchematicOptions
+  record: AltiumRecord
+  recordIndex: number
+  sourceTraceId: string
+}): SchematicText {
+  const {
+    connectedWires,
+    document,
+    location,
+    name,
+    options,
+    record,
+    recordIndex,
+    sourceTraceId,
+  } = params
+  const direction = getInlineNetLabelDirection(record, location, connectedWires)
+  const scaledLocation = scalePoint(location, options.scale)
+  const fontSize = getInlineNetLabelFontSize(record, document, options.scale)
+  const fontScale = fontSize / DEFAULT_INLINE_NET_LABEL_FONT_SIZE
+  const textWidth =
+    (name.length * INLINE_NET_LABEL_CHARACTER_WIDTH +
+      INLINE_NET_LABEL_HORIZONTAL_PADDING) *
+    fontScale
+  const isVertical = direction === "up" || direction === "down"
+  const directionSign = direction === "left" || direction === "down" ? -1 : 1
+  const isTerminalPort = record.recordKind === "18"
+  const anchor: SchematicText["anchor"] = isTerminalPort
+    ? directionSign > 0
+      ? "left"
+      : "right"
+    : "center"
+  const position = isTerminalPort
+    ? isVertical
+      ? {
+          x: scaledLocation.x - fontSize / 2,
+          y: scaledLocation.y,
+        }
+      : {
+          x: scaledLocation.x,
+          y: scaledLocation.y + fontSize / 2,
+        }
+    : isVertical
+      ? {
+          x: scaledLocation.x - fontSize / 2,
+          y: scaledLocation.y + (directionSign * textWidth) / 2,
+        }
+      : {
+          x: scaledLocation.x + (directionSign * textWidth) / 2,
+          y: scaledLocation.y + fontSize / 2,
+        }
+
+  return {
+    type: "schematic_text",
+    anchor,
+    color: INLINE_NET_LABEL_COLOR,
+    font_size: fontSize,
+    position,
+    rotation: isVertical ? -90 : 0,
+    schematic_sheet_id: options.schematicSheetId,
+    schematic_text_id: `schematic_inline_net_label_altium_${recordIndex}`,
+    source_trace_id: sourceTraceId,
+    text: name,
+  }
+}
+
+function getInlineNetLabelFontSize(
+  record: AltiumRecord,
+  document: AltiumSchDoc,
+  scale: number,
+): number {
+  const fontId = Math.max(
+    Math.round(Number(record.getCaseInsensitive("FONTID") ?? 1)),
+    1,
+  )
+  const sheetRecord = document.records.find(
+    (candidate) => candidate.recordKind === "31",
+  )
+  const sourceFontSize = Number(
+    sheetRecord?.getCaseInsensitive(`SIZE${fontId}`) ??
+      DEFAULT_INLINE_NET_LABEL_FONT_SIZE / scale,
+  )
+  return Math.min(
+    DEFAULT_INLINE_NET_LABEL_FONT_SIZE,
+    Math.max(MIN_INLINE_NET_LABEL_FONT_SIZE, sourceFontSize * scale),
+  )
+}
+
+function getInlineNetLabelDirection(
+  record: AltiumRecord,
+  location: AltiumPoint,
+  connectedWires: AltiumRecord[],
+): CardinalDirection {
+  if (record.recordKind !== "18") return getRecordDirection(record)
+
+  for (const wire of connectedWires) {
+    const points = getSchematicRecordPoints(wire)
+    for (let pointIndex = 1; pointIndex < points.length; pointIndex++) {
+      const start = points[pointIndex - 1]
+      const end = points[pointIndex]
+      if (!start || !end || !isPointOnSegment(location, start, end)) continue
+      const other = pointsEqual(location, start)
+        ? end
+        : pointsEqual(location, end)
+          ? start
+          : undefined
+      if (!other) continue
+      // A port's location is at the outer end of its short wire stub. Place
+      // its inline text away from the component, matching the side on which
+      // Altium drew the port name instead of covering the component body.
+      const dx = location.x - other.x
+      const dy = location.y - other.y
+      if (Math.abs(dx) >= Math.abs(dy)) return dx < 0 ? "left" : "right"
+      return dy < 0 ? "down" : "up"
+    }
+  }
+
+  return getRecordDirection(record)
 }
 
 function getOrCreateSourceNet(params: {
