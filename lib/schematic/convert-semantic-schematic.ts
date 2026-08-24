@@ -1073,10 +1073,22 @@ function convertNetLabels(params: {
         : record.getDecoded("TEXT")
     const location = getLocation(record)
     if (!name || !location) continue
-    const wire = graph.getConnectedWiresForRecord(record)[0]
+    const connectedWires = graph.getConnectedWiresForRecord(record)
+    const wire = connectedWires[0]
     // Altium's generic label record is also used for page titles and notes.
     // It is only an electrical net label when it touches a wire.
     if (recordKind === "4" && !wire) continue
+    // Circuit JSON represents labels placed inline with a trace as ordinary
+    // schematic text. Leave these records unhandled so the primitive fallback
+    // preserves their font, color, orientation, and justification as text.
+    // They have already participated in the semantic net graph above, so this
+    // only changes their rendered representation, not connectivity.
+    if (
+      (recordKind === "4" || recordKind === "25") &&
+      isInlineNetLabel(location, connectedWires)
+    ) {
+      continue
+    }
     handledRecords.add(record)
 
     const sourceNetId =
@@ -1111,6 +1123,29 @@ function convertNetLabels(params: {
     }
     elements.push(schematicNetLabel)
   }
+}
+
+function isInlineNetLabel(
+  location: AltiumPoint,
+  wires: AltiumRecord[],
+): boolean {
+  const incidentSegments = new Set<string>()
+
+  for (const wire of wires) {
+    const points = getSchematicRecordPoints(wire)
+    for (let pointIndex = 1; pointIndex < points.length; pointIndex++) {
+      const start = points[pointIndex - 1]
+      const end = points[pointIndex]
+      if (!start || !end || !isPointOnSegment(location, start, end)) continue
+
+      if (!pointsEqual(location, start) && !pointsEqual(location, end)) {
+        return true
+      }
+      incidentSegments.add(segmentKey(start, end))
+    }
+  }
+
+  return incidentSegments.size > 1
 }
 
 function getOrCreateSourceNet(params: {
