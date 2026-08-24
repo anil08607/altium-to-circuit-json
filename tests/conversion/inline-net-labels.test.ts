@@ -3,6 +3,8 @@ import { parseAltiumSchDoc } from "altiumts"
 import type { SchematicNetLabel, SchematicText } from "circuit-json"
 import { any_circuit_element } from "circuit-json"
 import { convertAltiumSchDocToCircuitJson } from "../../lib"
+import { TI_TMDS62LEVM_FIXTURE_NAME } from "../../scripts/references/reference-manifest"
+import { readReferenceBytes } from "../helpers/read-reference"
 
 test("inline Altium net labels render as schematic text", () => {
   const document = parseAltiumSchDoc(
@@ -27,25 +29,24 @@ test("inline Altium net labels render as schematic text", () => {
       element.type === "schematic_net_label",
   )
 
-  expect(schematicTexts).toEqual([
-    expect.objectContaining({
-      position: { x: 3, y: 5 },
-      schematic_text_id: "schematic_text_altium_2",
-      text: "STRICT_INTERIOR",
-    }),
-    expect.objectContaining({
-      position: { x: 5, y: 5 },
-      schematic_text_id: "schematic_text_altium_3",
-      text: "INLINE_VERTEX",
-    }),
+  expect(schematicTexts).toHaveLength(3)
+  expect(schematicTexts.map((text) => text.text)).toEqual([
+    "STRICT_INTERIOR",
+    "INLINE_VERTEX",
+    "TERMINAL",
   ])
-  expect(netLabels).toEqual([
-    expect.objectContaining({
-      anchor_position: { x: 9, y: 5 },
-      schematic_net_label_id: "schematic_net_label_altium_4",
-      text: "TERMINAL",
-    }),
-  ])
+  expect(
+    schematicTexts.every(
+      (text) =>
+        text.anchor === "center" &&
+        text.color === "rgb(132, 0, 0)" &&
+        text.font_size === 0.18 &&
+        text.rotation === 0 &&
+        text.source_trace_id === "source_trace_altium_0" &&
+        text.schematic_text_id.startsWith("schematic_inline_net_label_altium_"),
+    ),
+  ).toBe(true)
+  expect(netLabels).toEqual([])
   expect(
     circuitJson.find((element) => element.type === "source_trace"),
   ).toMatchObject({
@@ -55,6 +56,63 @@ test("inline Altium net labels render as schematic text", () => {
       "source_net_altium_terminal",
     ],
   })
+  expect(
+    circuitJson.every(
+      (element) => any_circuit_element.safeParse(element).success,
+    ),
+  ).toBe(true)
+})
+
+test("two-port Altium signal ports use inline net-label styling", async () => {
+  const source = await readReferenceBytes(
+    `${TI_TMDS62LEVM_FIXTURE_NAME}/12.SchDoc`,
+  )
+  const circuitJson = convertAltiumSchDocToCircuitJson(
+    parseAltiumSchDoc(source),
+  )
+  const schematicTexts = circuitJson.filter(
+    (element): element is SchematicText => element.type === "schematic_text",
+  )
+  const netLabels = circuitJson.filter(
+    (element): element is SchematicNetLabel =>
+      element.type === "schematic_net_label",
+  )
+  const inlineUsbcLabels = schematicTexts.filter((text) =>
+    ["USBC_CONN2_CC1", "USBC_CONN2_CC2"].includes(text.text),
+  )
+  const inlineDrain2Labels = schematicTexts.filter(
+    (text) => text.text === "DRAIN2",
+  )
+
+  expect(inlineUsbcLabels).toHaveLength(6)
+  expect(
+    inlineUsbcLabels.every(
+      (text) =>
+        ["center", "left", "right"].includes(text.anchor) &&
+        text.color === "rgb(132, 0, 0)" &&
+        text.font_size >= 0.1 &&
+        text.font_size <= 0.18 &&
+        Boolean(text.source_trace_id),
+    ),
+  ).toBe(true)
+  expect(
+    netLabels.some((label) =>
+      ["USBC_CONN2_CC1", "USBC_CONN2_CC2"].includes(label.text),
+    ),
+  ).toBe(false)
+  expect(netLabels.some((label) => label.text === "P2_PP_EXT_ENABLE")).toBe(
+    true,
+  )
+  expect(inlineDrain2Labels).toHaveLength(2)
+  expect(
+    inlineDrain2Labels.every(
+      (text) =>
+        text.color === "rgb(132, 0, 0)" &&
+        text.anchor === "center" &&
+        text.font_size === 0.1 &&
+        Boolean(text.source_trace_id),
+    ),
+  ).toBe(true)
   expect(
     circuitJson.every(
       (element) => any_circuit_element.safeParse(element).success,
