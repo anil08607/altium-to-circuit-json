@@ -666,13 +666,13 @@
     L 267.1677091862139,158.4546006645503
     Z
   " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.45895717946px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_3042__stack1" x="267.9938321092419" y="156.1598147672503" fill="rgb(132, 0, 0)" text-anchor="start" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="4.13061461514px" transform="">WKUP_I2C0_SCL</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_3046__stack1" d="
-    M 413.0378051533478,404.61104380563614
-    L 414.2769895378898,402.3162579083361
-    L 445.4891374556995,402.3162579083361
-    L 445.4891374556995,406.90582970293616
-    L 414.2769895378898,406.90582970293616
+    M 432.6523758669045,404.61104380563614
+    L 431.4131914823625,406.90582970293616
+    L 400.2010435645528,406.90582970293616
+    L 400.2010435645528,402.3162579083361
+    L 431.4131914823625,402.3162579083361
     Z
-  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.45895717946px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_3046__stack1" x="415.10311246091777" y="404.61104380563614" fill="rgb(132, 0, 0)" text-anchor="start" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="4.13061461514px" transform="">EXT_CLKOUT0</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_3048__stack1" d="
+  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.45895717946px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_3046__stack1" x="430.5870685593345" y="404.61104380563614" fill="rgb(132, 0, 0)" text-anchor="end" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="4.13061461514px" transform="">EXT_CLKOUT0</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_3048__stack1" d="
     M 236.50666873133676,165.96710012402872
     L 237.74585311587876,163.67231422672873
     L 303.94277696665944,163.67231422672873

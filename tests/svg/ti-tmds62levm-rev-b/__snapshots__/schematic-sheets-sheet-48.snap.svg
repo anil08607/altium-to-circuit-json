@@ -495,34 +495,34 @@
     L 605.9633975920826,350.64469289068927
     Z
   " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.425707222912px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1118__stack1" x="606.7296705933243" y="348.51615677612926" fill="rgb(132, 0, 0)" text-anchor="start" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="3.831365006208px" transform="">VDDS_RTC_1V8_ALERT</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1120__stack1" d="
-    M 497.47199122303414,372.77423516419395
-    L 498.62140072489655,370.64569904963395
-    L 543.6555488126806,370.64569904963395
-    L 543.6555488126806,374.90277127875396
-    L 498.62140072489655,374.90277127875396
+    M 525.9752333290102,372.77423516419395
+    L 524.8258238271478,374.90277127875396
+    L 479.79167573936365,374.90277127875396
+    L 479.79167573936365,370.64569904963395
+    L 524.8258238271478,370.64569904963395
     Z
-  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.425707222912px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1120__stack1" x="499.38767372613813" y="372.77423516419395" fill="rgb(132, 0, 0)" text-anchor="start" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="3.831365006208px" transform="">SoC_VDDS_RTC_1V8_N</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1122__stack1" d="
-    M 497.47199122303414,300
-    L 498.62140072489655,297.87146388544
-    L 543.5136464050433,297.87146388544
-    L 543.5136464050433,302.12853611456
-    L 498.62140072489655,302.12853611456
+  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.425707222912px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1120__stack1" x="524.0595508259062" y="372.77423516419395" fill="rgb(132, 0, 0)" text-anchor="end" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="3.831365006208px" transform="">SoC_VDDS_RTC_1V8_N</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1122__stack1" d="
+    M 525.9752333290102,300
+    L 524.8258238271478,302.12853611456
+    L 479.933578147001,302.12853611456
+    L 479.933578147001,297.87146388544
+    L 524.8258238271478,297.87146388544
     Z
-  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.425707222912px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1122__stack1" x="499.38767372613813" y="300" fill="rgb(132, 0, 0)" text-anchor="start" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="3.831365006208px" transform="">SoC_VDDS_RTC_1V8_P</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1124__stack1" d="
-    M 228.8137730752181,296.9677402014919
-    L 229.96318257708052,294.8392040869319
-    L 263.63094781311423,294.8392040869319
-    L 263.63094781311423,299.0962763160519
-    L 229.96318257708052,299.0962763160519
+  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.425707222912px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1122__stack1" x="524.0595508259062" y="300" fill="rgb(132, 0, 0)" text-anchor="end" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="3.831365006208px" transform="">SoC_VDDS_RTC_1V8_P</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1124__stack1" d="
+    M 250.0395916647747,296.9677402014919
+    L 248.89018216291228,299.0962763160519
+    L 215.22241692687857,299.0962763160519
+    L 215.22241692687857,294.8392040869319
+    L 248.89018216291228,294.8392040869319
     Z
-  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.425707222912px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1124__stack1" x="230.7294555783221" y="296.9677402014919" fill="rgb(132, 0, 0)" text-anchor="start" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="3.831365006208px" transform="">SoC_VDD_RTC_P</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1126__stack1" d="
-    M 228.8137730752181,378.8387547612101
-    L 229.96318257708052,376.7102186466501
-    L 263.77285022075154,376.7102186466501
-    L 263.77285022075154,380.9672908757701
-    L 229.96318257708052,380.9672908757701
+  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.425707222912px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1124__stack1" x="248.1239091616707" y="296.9677402014919" fill="rgb(132, 0, 0)" text-anchor="end" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="3.831365006208px" transform="">SoC_VDD_RTC_P</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1126__stack1" d="
+    M 250.0395916647747,378.8387547612101
+    L 248.89018216291228,380.9672908757701
+    L 215.08051451924126,380.9672908757701
+    L 215.08051451924126,376.7102186466501
+    L 248.89018216291228,376.7102186466501
     Z
-  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.425707222912px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1126__stack1" x="230.7294555783221" y="378.8387547612101" fill="rgb(132, 0, 0)" text-anchor="start" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="3.831365006208px" transform="">SoC_VDD_RTC_N</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1128__stack1" d="
+  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.425707222912px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1126__stack1" x="248.1239091616707" y="378.8387547612101" fill="rgb(132, 0, 0)" text-anchor="end" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="3.831365006208px" transform="">SoC_VDD_RTC_N</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1128__stack1" d="
     M 322.8138268289687,348.51615677612926
     L 323.9632363308311,346.38762066156926
     L 357.91480638213943,346.38762066156926
@@ -551,20 +551,20 @@
     L 320.930976532323,214.19300195782563
     Z
   " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.425707222912px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1134__stack1" x="321.69724953356456" y="212.06446584326562" fill="rgb(132, 0, 0)" text-anchor="start" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="3.831365006208px" transform="">VDD_LPDDR4_1_ALERT</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1136__stack1" d="
-    M 225.78151327671006,242.38706382834644
-    L 226.93092277857247,240.25852771378644
-    L 260.4567856069688,240.25852771378644
-    L 260.4567856069688,244.51559994290645
-    L 226.93092277857247,244.51559994290645
+    M 247.0073318662666,242.38706382834644
+    L 245.8579223644042,244.51559994290645
+    L 212.33205953600785,244.51559994290645
+    L 212.33205953600785,240.25852771378644
+    L 245.8579223644042,240.25852771378644
     Z
-  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.425707222912px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1136__stack1" x="227.69719577981405" y="242.38706382834644" fill="rgb(132, 0, 0)" text-anchor="start" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="3.831365006208px" transform="">VDD_LPDDR4_N1</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1138__stack1" d="
-    M 225.78151327671006,160.51604926862822
-    L 226.93092277857247,158.38751315406822
-    L 260.3148831993315,158.38751315406822
-    L 260.3148831993315,162.64458538318823
-    L 226.93092277857247,162.64458538318823
+  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.425707222912px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1136__stack1" x="245.09164936316262" y="242.38706382834644" fill="rgb(132, 0, 0)" text-anchor="end" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="3.831365006208px" transform="">VDD_LPDDR4_N1</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1138__stack1" d="
+    M 247.0073318662666,160.51604926862822
+    L 245.8579223644042,162.64458538318823
+    L 212.47396194364518,162.64458538318823
+    L 212.47396194364518,158.38751315406822
+    L 245.8579223644042,158.38751315406822
     Z
-  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.425707222912px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1138__stack1" x="227.69719577981405" y="160.51604926862822" fill="rgb(132, 0, 0)" text-anchor="start" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="3.831365006208px" transform="">VDD_LPDDR4_P1</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1140__stack1" d="
+  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.425707222912px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1138__stack1" x="245.09164936316262" y="160.51604926862822" fill="rgb(132, 0, 0)" text-anchor="end" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="3.831365006208px" transform="">VDD_LPDDR4_P1</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1140__stack1" d="
     M 395.5880619931626,218.1289854402818
     L 396.73747149502503,216.0004493257218
     L 419.5525405949555,216.0004493257218
@@ -593,20 +593,20 @@
     L 605.9633975920826,211.16074215931755
     Z
   " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.425707222912px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1146__stack1" x="606.7296705933243" y="209.03220604475754" fill="rgb(132, 0, 0)" text-anchor="start" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="3.831365006208px" transform="">VDD_LPDDR4_2_ALERT</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1148__stack1" d="
-    M 504.7494147394535,233.2902844328222
-    L 505.89882424131594,231.1617483182622
-    L 539.4246870697123,231.1617483182622
-    L 539.4246870697123,235.4188205473822
-    L 505.89882424131594,235.4188205473822
+    M 525.9752333290102,233.2902844328222
+    L 524.8258238271478,235.4188205473822
+    L 491.2999609987514,235.4188205473822
+    L 491.2999609987514,231.1617483182622
+    L 524.8258238271478,231.1617483182622
     Z
-  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.425707222912px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1148__stack1" x="506.6650972425575" y="233.2902844328222" fill="rgb(132, 0, 0)" text-anchor="start" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="3.831365006208px" transform="">VDD_LPDDR4_N2</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1150__stack1" d="
-    M 504.7494147394535,160.51604926862822
-    L 505.89882424131594,158.38751315406822
-    L 539.282784662075,158.38751315406822
-    L 539.282784662075,162.64458538318823
-    L 505.89882424131594,162.64458538318823
+  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.425707222912px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1148__stack1" x="524.0595508259062" y="233.2902844328222" fill="rgb(132, 0, 0)" text-anchor="end" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="3.831365006208px" transform="">VDD_LPDDR4_N2</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1150__stack1" d="
+    M 525.9752333290102,160.51604926862822
+    L 524.8258238271478,162.64458538318823
+    L 491.44186340638873,162.64458538318823
+    L 491.44186340638873,158.38751315406822
+    L 524.8258238271478,158.38751315406822
     Z
-  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.425707222912px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1150__stack1" x="506.6650972425575" y="160.51604926862822" fill="rgb(132, 0, 0)" text-anchor="start" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="3.831365006208px" transform="">VDD_LPDDR4_P2</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1152__stack1" d="
+  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.425707222912px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1150__stack1" x="524.0595508259062" y="160.51604926862822" fill="rgb(132, 0, 0)" text-anchor="end" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="3.831365006208px" transform="">VDD_LPDDR4_P2</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_1152__stack1" d="
     M 686.6850026499385,212.06446584326562
     L 687.8344121518008,209.93592972870562
     L 710.6494812517313,209.93592972870562

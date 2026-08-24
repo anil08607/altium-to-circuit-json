@@ -75,6 +75,11 @@ interface Bounds {
   minY: number
 }
 
+interface SchematicSegment {
+  end: AltiumPoint
+  start: AltiumPoint
+}
+
 type CardinalDirection = "up" | "down" | "left" | "right"
 
 const DIRECTION_BY_ORIENTATION: readonly CardinalDirection[] = [
@@ -535,7 +540,7 @@ function buildSemanticNetGraph(
   const wireRecords = document.records.filter(
     (record) => record.recordKind === "27",
   )
-  const segments: Array<{ end: AltiumPoint; start: AltiumPoint }> = []
+  const segments: SchematicSegment[] = []
 
   for (const wire of wireRecords) {
     const points = getSchematicRecordPoints(wire)
@@ -555,7 +560,10 @@ function buildSemanticNetGraph(
     if (!["4", "17", "18", "25", "29"].includes(record.recordKind ?? "")) {
       return []
     }
-    const point = getLocation(record)
+    const point =
+      record.recordKind === "18"
+        ? getPortConnectionGeometry(record, segments)?.anchor
+        : getLocation(record)
     return point ? [{ point, record }] : []
   })
   const positionedPins = convertedPorts.map(({ point, record }) => ({
@@ -964,6 +972,7 @@ function getEquivalentPortPrunedSegmentKeys(params: {
     .map((port) => port.point)
   if (hiddenPortPoints.length === 0) return new Set()
 
+  const wireSegments = getWireSegments(wires)
   const protectedPointKeys = new Set(
     convertedPorts
       .filter((port) => port.isSchematicVisible)
@@ -971,7 +980,10 @@ function getEquivalentPortPrunedSegmentKeys(params: {
   )
   for (const record of net.records) {
     if (!["4", "17", "18", "25"].includes(record.recordKind ?? "")) continue
-    const location = getLocation(record)
+    const location =
+      record.recordKind === "18"
+        ? getPortConnectionGeometry(record, wireSegments)?.anchor
+        : getLocation(record)
     if (location) protectedPointKeys.add(pointKey(location))
   }
 
@@ -1090,6 +1102,9 @@ function convertNetLabels(params: {
     options,
     semanticNetGraph: graph,
   } = params
+  const allWireSegments = getWireSegments(
+    document.records.filter((record) => record.recordKind === "27"),
+  )
 
   for (const [recordIndex, record] of document.records.entries()) {
     const recordKind = record.recordKind
@@ -1104,7 +1119,11 @@ function convertNetLabels(params: {
       record.recordKind === "18"
         ? record.getDecoded("NAME")
         : record.getDecoded("TEXT")
-    const location = getLocation(record)
+    const portConnection =
+      recordKind === "18"
+        ? getPortConnectionGeometry(record, allWireSegments)
+        : undefined
+    const location = portConnection?.anchor ?? getLocation(record)
     if (!name || !location) continue
     const connectedWires = graph.getConnectedWiresForRecord(record)
     const wire = connectedWires[0]
@@ -1155,10 +1174,9 @@ function convertNetLabels(params: {
     const schematicNetLabel: SchematicNetLabel = {
       type: "schematic_net_label",
       anchor_position: scalePoint(location, options.scale),
-      anchor_side:
-        record.recordKind === "18" || record.recordKind === "4"
-          ? "left"
-          : directionToOppositeSide(direction),
+      anchor_side: directionToOppositeSide(
+        portConnection?.bodyDirection ?? direction,
+      ),
       center: scalePoint(location, options.scale),
       schematic_net_label_id: `schematic_net_label_altium_${recordIndex}`,
       schematic_sheet_id: options.schematicSheetId,
@@ -1282,9 +1300,8 @@ function getInlineNetLabelDirection(
           ? start
           : undefined
       if (!other) continue
-      // A port's location is at the outer end of its short wire stub. Place
-      // its inline text away from the component, matching the side on which
-      // Altium drew the port name instead of covering the component body.
+      // Place the inline text away from the wire interior, matching the side
+      // on which Altium drew the port body instead of covering the circuit.
       const dx = location.x - other.x
       const dy = location.y - other.y
       if (Math.abs(dx) >= Math.abs(dy)) return dx < 0 ? "left" : "right"
@@ -1293,6 +1310,61 @@ function getInlineNetLabelDirection(
   }
 
   return getRecordDirection(record)
+}
+
+function getWireSegments(wires: AltiumRecord[]): SchematicSegment[] {
+  return wires.flatMap((wire) => {
+    const points = getSchematicRecordPoints(wire)
+    const segments: SchematicSegment[] = []
+    for (let pointIndex = 1; pointIndex < points.length; pointIndex++) {
+      const start = points[pointIndex - 1]
+      const end = points[pointIndex]
+      if (start && end) segments.push({ end, start })
+    }
+    return segments
+  })
+}
+
+function getPortConnectionGeometry(
+  record: AltiumRecord,
+  wireSegments: SchematicSegment[],
+): { anchor: AltiumPoint; bodyDirection: CardinalDirection } | undefined {
+  const origin = getLocation(record)
+  if (!origin) return undefined
+
+  const originToExtremity = getRecordDirection(record)
+  const directionVector = VECTOR_BY_DIRECTION[originToExtremity]
+  const width = Math.max(record.getNumber("WIDTH") ?? 16, 0)
+  const extremity = {
+    x: origin.x + directionVector.x * width,
+    y: origin.y + directionVector.y * width,
+  }
+  const touchesWire = (point: AltiumPoint): boolean =>
+    wireSegments.some((segment) =>
+      isPointOnSegment(point, segment.start, segment.end),
+    )
+  const originConnected = touchesWire(origin)
+  const extremityConnected = touchesWire(extremity)
+  const connectedEnd = record.getNumber("CONNECTEDEND")
+  const connectsAtExtremity =
+    connectedEnd === 2 ||
+    (connectedEnd !== 1 &&
+      connectedEnd !== 3 &&
+      !originConnected &&
+      extremityConnected)
+
+  return connectsAtExtremity
+    ? {
+        anchor: extremity,
+        bodyDirection: getOppositeDirection(originToExtremity),
+      }
+    : { anchor: origin, bodyDirection: originToExtremity }
+}
+
+function getOppositeDirection(direction: CardinalDirection): CardinalDirection {
+  if (direction === "up") return "down"
+  if (direction === "down") return "up"
+  return direction === "left" ? "right" : "left"
 }
 
 function getOrCreateSourceNet(params: {

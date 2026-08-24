@@ -96,6 +96,61 @@ test("inline net labels follow the Altium text orientation", () => {
   })
 })
 
+test("anchored Altium ports face away from their wired end", () => {
+  const document = parseAltiumSchDoc(
+    [
+      "|RECORD=31|CUSTOMX=120|CUSTOMY=120|SIZE1=10|FONTNAME1=Arial",
+      "|RECORD=27|LOCATIONCOUNT=2|X1=10|Y1=30|X2=30|Y2=30",
+      "|RECORD=18|LOCATION.X=30|LOCATION.Y=30|NAME=ORIGIN_RIGHT|IOTYPE=1|WIDTH=40|HEIGHT=10|FONTID=1",
+      "|RECORD=27|LOCATIONCOUNT=2|X1=100|Y1=50|X2=110|Y2=50",
+      "|RECORD=18|LOCATION.X=60|LOCATION.Y=50|NAME=EXTREMITY_RIGHT|IOTYPE=1|WIDTH=40|HEIGHT=10|FONTID=1",
+      "|RECORD=27|LOCATIONCOUNT=2|X1=50|Y1=90|X2=50|Y2=110",
+      "|RECORD=18|LOCATION.X=50|LOCATION.Y=70|NAME=EXTREMITY_UP|ORIENTATION=1|IOTYPE=1|WIDTH=20|HEIGHT=10|FONTID=1",
+      "|RECORD=27|LOCATIONCOUNT=2|X1=10|Y1=60|X2=30|Y2=60",
+      "|RECORD=18|LOCATION.X=50|LOCATION.Y=60|NAME=EXTREMITY_LEFT|ORIENTATION=2|IOTYPE=1|WIDTH=20|HEIGHT=10|FONTID=1",
+      "|RECORD=27|LOCATIONCOUNT=2|X1=90|Y1=10|X2=90|Y2=30",
+      "|RECORD=18|LOCATION.X=90|LOCATION.Y=50|NAME=EXTREMITY_DOWN|ORIENTATION=3|IOTYPE=1|WIDTH=20|HEIGHT=10|FONTID=1",
+    ].join("\n"),
+  )
+  const labelsByText = Object.fromEntries(
+    convertAltiumSchDocToCircuitJson(document, {
+      centerOnSchematicSheet: false,
+      schematicUnitScale: 0.1,
+    })
+      .filter(
+        (element): element is SchematicNetLabel =>
+          element.type === "schematic_net_label",
+      )
+      .map((label) => [label.text, label]),
+  )
+
+  expect(labelsByText.ORIGIN_RIGHT).toMatchObject({
+    anchor_position: { x: 3, y: 3 },
+    anchor_side: "left",
+    schematic_trace_id: "schematic_trace_altium_1",
+  })
+  expect(labelsByText.EXTREMITY_RIGHT).toMatchObject({
+    anchor_position: { x: 10, y: 5 },
+    anchor_side: "right",
+    schematic_trace_id: "schematic_trace_altium_3",
+  })
+  expect(labelsByText.EXTREMITY_UP).toMatchObject({
+    anchor_position: { x: 5, y: 9 },
+    anchor_side: "top",
+    schematic_trace_id: "schematic_trace_altium_5",
+  })
+  expect(labelsByText.EXTREMITY_LEFT).toMatchObject({
+    anchor_position: { x: 3, y: 6 },
+    anchor_side: "left",
+    schematic_trace_id: "schematic_trace_altium_7",
+  })
+  expect(labelsByText.EXTREMITY_DOWN).toMatchObject({
+    anchor_position: { x: 9, y: 3 },
+    anchor_side: "bottom",
+    schematic_trace_id: "schematic_trace_altium_9",
+  })
+})
+
 test("sheet 12 preserves inline and anchored Altium labels independently", async () => {
   const source = await readReferenceBytes(
     `${TI_TMDS62LEVM_FIXTURE_NAME}/12.SchDoc`,
@@ -144,9 +199,18 @@ test("sheet 12 preserves inline and anchored Altium labels independently", async
     "schematic_net_label_altium_2750",
     "schematic_net_label_altium_2752",
   ])
-  expect(netLabels.some((label) => label.text === "P2_PP_EXT_ENABLE")).toBe(
-    true,
-  )
+  expect(
+    anchoredUsbcLabels.every(
+      (label) =>
+        label.anchor_side === "right" && Boolean(label.schematic_trace_id),
+    ),
+  ).toBe(true)
+  expect(
+    netLabels.find((label) => label.text === "P2_PP_EXT_ENABLE"),
+  ).toMatchObject({
+    anchor_side: "left",
+    schematic_trace_id: "schematic_trace_altium_2634",
+  })
   expect(inlineDrain2Labels).toHaveLength(2)
   expect(
     inlineDrain2Labels.every(
