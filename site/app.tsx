@@ -202,7 +202,7 @@ function createRunframeHtml(
     showRightHeaderContent: false,
     showToggleFullScreen: true,
   }
-  return `<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body,#root{height:100%;margin:0}body{background:#f8fafb}</style></head><body><div id="root"></div><script>window.CIRCUIT_JSON=${encode(circuitJson)};window.CIRCUIT_JSON_PREVIEW_PROPS=${encode(props)}</script><script src="${runframeUrl}"></script></body></html>`
+  return `<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body,#root{height:100%;margin:0}body{background:#f8fafb}</style></head><body><div id="root"></div><script>try{if(localStorage.getItem("altium-viewer-silkscreen-initialized")!=="1"){localStorage.setItem("pcb_viewer_is_showing_silkscreen","true");localStorage.setItem("altium-viewer-silkscreen-initialized","1")}}catch{}window.CIRCUIT_JSON=${encode(circuitJson)};window.CIRCUIT_JSON_PREVIEW_PROPS=${encode(props)}</script><script src="${runframeUrl}"></script></body></html>`
 }
 
 function getInputKind(fileName: string | null): InputKind | null {
