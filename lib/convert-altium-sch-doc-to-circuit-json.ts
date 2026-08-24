@@ -9,6 +9,7 @@ import type {
   Point,
   SchematicArc,
   SchematicCircle,
+  SchematicGroup,
   SchematicLine,
   SchematicPath,
   SchematicRect,
@@ -86,6 +87,33 @@ export function convertAltiumSchDocToCircuitJson(
     if (!shouldRenderSchematicRecord(record, context)) continue
     const converted = convertSchematicRecord(record, index, context, options)
     elements.push(...converted)
+  }
+
+  const schematicComponentIds = elements
+    .filter(
+      (
+        element,
+      ): element is Extract<
+        AnyCircuitElement,
+        { type: "schematic_component" }
+      > => element.type === "schematic_component",
+    )
+    .map((element) => element.schematic_component_id)
+  if (schematicComponentIds.length > 0) {
+    elements.push({
+      type: "schematic_group",
+      schematic_group_id: "schematic_group_altium",
+      source_group_id: "source_group_altium",
+      schematic_sheet_id: SCHEMATIC_SHEET_ID,
+      center: {
+        x: (sheetDimensions.width * scale) / 2,
+        y: (sheetDimensions.height * scale) / 2,
+      },
+      width: sheetDimensions.width * scale,
+      height: sheetDimensions.height * scale,
+      schematic_component_ids: schematicComponentIds,
+      name: options.sheetName ?? "Altium schematic",
+    } satisfies SchematicGroup)
   }
 
   if (options.centerOnSchematicSheet === false) return elements

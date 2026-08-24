@@ -1,11 +1,12 @@
-import { convertAltiumToCircuitJson } from "../lib"
 import type { AnyCircuitElement } from "circuit-json"
-import { useEffect, useRef, useState } from "react"
+import { unzipSync } from "fflate"
 import type { ChangeEvent, DragEvent } from "react"
+import { useEffect, useRef, useState } from "react"
+import { convertAltiumToCircuitJson } from "../lib"
 
 const runframeUrl =
   "https://unpkg.com/@tscircuit/runframe/dist/standalone-preview.min.js"
-const acceptedFileTypes = ".PcbDoc,.SchDoc"
+const acceptedFileTypes = ".PcbDoc,.SchDoc,.zip"
 type InputKind = "pcb" | "schematic"
 
 export function App() {
@@ -23,11 +24,14 @@ export function App() {
       setFrame(null)
       return
     }
-    const kind = getInputKind(fileName)
-    if (!kind) {
+    const fileKind = getInputKind(fileName)
+    if (!fileKind) {
       setFrame(null)
       return
     }
+    const kind: InputKind = fileName?.toLowerCase().endsWith(".zip")
+      ? "schematic"
+      : fileKind
     const html = createRunframeHtml(json, kind, baseName(fileName))
     const url = URL.createObjectURL(new Blob([html], { type: "text/html" }))
     setFrame(url)
@@ -43,15 +47,16 @@ export function App() {
     const kind = getInputKind(file.name)
     if (!kind) {
       setJson(null)
-      setError("Drop an Altium .PcbDoc or .SchDoc file.")
+      setError("Drop an Altium .PcbDoc, .SchDoc, or project .zip file.")
       setConverting(false)
       return
     }
     try {
+      const bytes = await file.arrayBuffer()
       setJson(
-        convertAltiumToCircuitJson(await file.arrayBuffer(), {
-          sourceType: kind,
-        }),
+        file.name.toLowerCase().endsWith(".zip")
+          ? convertProjectZip(bytes)
+          : convertAltiumToCircuitJson(bytes, { sourceType: kind }),
       )
     } catch (e) {
       setJson(null)
@@ -80,8 +85,9 @@ export function App() {
         <span className="eyebrow">Altium to Circuit JSON</span>
         <h1>Convert Altium files in your browser</h1>
         <p className="lede">
-          Drop an Altium PCB or schematic document to convert it with this
-          repository and inspect the result in the embedded tscircuit viewer.
+          Drop an Altium PCB, schematic document, or project ZIP to convert it
+          with this repository and inspect the result in the embedded tscircuit
+          viewer.
         </p>
         <p className="privacy-note">Your files stay in this browser.</p>
         <div
@@ -105,7 +111,8 @@ export function App() {
             <span className="badge">Drag and drop</span>
             <strong>Altium PCB or schematic document</strong>
             <p>
-              or browse for a local <code>.PcbDoc</code> or <code>.SchDoc</code>
+              or browse for a local <code>.PcbDoc</code>, <code>.SchDoc</code>,
+              or <code>.zip</code>
             </p>
           </div>
           <button
@@ -199,7 +206,7 @@ function createRunframeHtml(
     showCodeTab: false,
     showFileMenu: false,
     showJsonTab: true,
-    showRightHeaderContent: false,
+    showRightHeaderContent: true,
     showToggleFullScreen: true,
   }
   return `<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body,#root{height:100%;margin:0}body{background:#f8fafb}</style></head><body><div id="root"></div><script>try{if(localStorage.getItem("altium-viewer-silkscreen-initialized")!=="1"){localStorage.setItem("pcb_viewer_is_showing_silkscreen","true");localStorage.setItem("altium-viewer-silkscreen-initialized","1")}}catch{}window.CIRCUIT_JSON=${encode(circuitJson)};window.CIRCUIT_JSON_PREVIEW_PROPS=${encode(props)}</script><script src="${runframeUrl}"></script></body></html>`
@@ -209,11 +216,12 @@ function getInputKind(fileName: string | null): InputKind | null {
   if (!fileName) return null
   if (fileName.toLowerCase().endsWith(".pcbdoc")) return "pcb"
   if (fileName.toLowerCase().endsWith(".schdoc")) return "schematic"
+  if (fileName.toLowerCase().endsWith(".zip")) return "pcb"
   return null
 }
 
 function baseName(name: string | null) {
-  return name?.replace(/\.(pcbdoc|schdoc)$/i, "") ?? "board"
+  return name?.replace(/\.(pcbdoc|schdoc|zip)$/i, "") ?? "board"
 }
 
 function download(data: unknown, name: string) {
@@ -226,4 +234,58 @@ function download(data: unknown, name: string) {
   link.download = name
   link.click()
   URL.revokeObjectURL(url)
+}
+
+function convertProjectZip(source: ArrayBuffer): AnyCircuitElement[] {
+  const entries = unzipSync(new Uint8Array(source))
+  const files = Object.entries(entries).filter(
+    ([name, bytes]) => bytes.length > 0 && !name.endsWith("/"),
+  )
+  const pcb = files.find(([name]) => /\.pcbdoc$/i.test(name))
+  const schematics = files
+    .filter(([name]) => /\.schdoc$/i.test(name))
+    .sort(([a], [b]) => a.localeCompare(b))
+  if (!pcb && schematics.length === 0) {
+    throw new TypeError("ZIP does not contain an Altium .PcbDoc or .SchDoc")
+  }
+  const elements: AnyCircuitElement[] = pcb
+    ? convertAltiumToCircuitJson(pcb[1], { sourceType: "pcb" })
+    : []
+  for (const [index, [name, bytes]] of schematics.entries()) {
+    const sheet = convertAltiumToCircuitJson(bytes, {
+      sourceType: "schematic",
+      schematic: { sheetName: name.split("/").pop() },
+    })
+    elements.push(...namespaceElements(sheet, `sheet_${index}`))
+  }
+  return elements
+}
+
+function namespaceElements(
+  elements: AnyCircuitElement[],
+  namespace: string,
+): AnyCircuitElement[] {
+  const ids = new Set<string>()
+  for (const element of elements) {
+    for (const [key, value] of Object.entries(element)) {
+      if (key.endsWith("_id") || key.endsWith("_ids")) {
+        if (typeof value === "string") ids.add(value)
+        if (Array.isArray(value)) {
+          for (const item of value) if (typeof item === "string") ids.add(item)
+        }
+      }
+    }
+  }
+  const remap = (value: unknown): unknown => {
+    if (typeof value === "string" && ids.has(value))
+      return `${namespace}_${value}`
+    if (Array.isArray(value)) return value.map(remap)
+    if (value && typeof value === "object") {
+      return Object.fromEntries(
+        Object.entries(value).map(([key, nested]) => [key, remap(nested)]),
+      )
+    }
+    return value
+  }
+  return elements.map((element) => remap(element) as AnyCircuitElement)
 }
