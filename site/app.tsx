@@ -1,4 +1,4 @@
-import { convertAltiumToCircuitJson } from "@project-lib"
+import { convertAltiumToCircuitJson } from "../lib"
 import type { AnyCircuitElement } from "circuit-json"
 import { useEffect, useRef, useState } from "react"
 import type { ChangeEvent, DragEvent } from "react"

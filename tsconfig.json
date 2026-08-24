@@ -14,9 +14,7 @@
     "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,
     "types": ["bun"],
-    "jsx": "react-jsx",
-    "baseUrl": ".",
-    "paths": { "@project-lib": ["./lib/index.ts"] }
+    "jsx": "react-jsx"
   },
   "include": ["lib", "scripts", "tests", "site"],
   "exclude": ["dist", "dist-site", "node_modules"]
