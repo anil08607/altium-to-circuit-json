@@ -1098,6 +1098,7 @@ function convertNetLabels(params: {
       Boolean(sourceTraceId) &&
       (recordKind === "25" ||
         (recordKind === "18" &&
+          (record.getNumber("IOTYPE") ?? 0) === 0 &&
           connectivity.sourcePortCountByRecord.get(record) === 2 &&
           !isPowerNet(name)))
     if (shouldRenderInline && sourceTraceId) {

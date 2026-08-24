@@ -63,7 +63,7 @@ test("inline Altium net labels render as schematic text", () => {
   ).toBe(true)
 })
 
-test("two-port Altium signal ports use inline net-label styling", async () => {
+test("sheet 12 preserves inline and anchored Altium labels independently", async () => {
   const source = await readReferenceBytes(
     `${TI_TMDS62LEVM_FIXTURE_NAME}/12.SchDoc`,
   )
@@ -80,11 +80,20 @@ test("two-port Altium signal ports use inline net-label styling", async () => {
   const inlineUsbcLabels = schematicTexts.filter((text) =>
     ["USBC_CONN2_CC1", "USBC_CONN2_CC2"].includes(text.text),
   )
+  const anchoredUsbcLabels = netLabels.filter((label) =>
+    ["USBC_CONN2_CC1", "USBC_CONN2_CC2"].includes(label.text),
+  )
   const inlineDrain2Labels = schematicTexts.filter(
     (text) => text.text === "DRAIN2",
   )
 
-  expect(inlineUsbcLabels).toHaveLength(6)
+  expect(inlineUsbcLabels).toHaveLength(4)
+  expect(inlineUsbcLabels.map((text) => text.schematic_text_id)).toEqual([
+    "schematic_inline_net_label_altium_2541",
+    "schematic_inline_net_label_altium_2543",
+    "schematic_inline_net_label_altium_2747",
+    "schematic_inline_net_label_altium_2749",
+  ])
   expect(
     inlineUsbcLabels.every(
       (text) =>
@@ -95,11 +104,13 @@ test("two-port Altium signal ports use inline net-label styling", async () => {
         Boolean(text.source_trace_id),
     ),
   ).toBe(true)
+  expect(anchoredUsbcLabels).toHaveLength(2)
   expect(
-    netLabels.some((label) =>
-      ["USBC_CONN2_CC1", "USBC_CONN2_CC2"].includes(label.text),
-    ),
-  ).toBe(false)
+    anchoredUsbcLabels.map((label) => label.schematic_net_label_id),
+  ).toEqual([
+    "schematic_net_label_altium_2750",
+    "schematic_net_label_altium_2752",
+  ])
   expect(netLabels.some((label) => label.text === "P2_PP_EXT_ENABLE")).toBe(
     true,
   )
