@@ -1339,12 +1339,12 @@ function getPortConnectionGeometry(
     x: origin.x + directionVector.x * width,
     y: origin.y + directionVector.y * width,
   }
-  const touchesWire = (point: AltiumPoint): boolean =>
+  const touchesWireEndpoint = (point: AltiumPoint): boolean =>
     wireSegments.some((segment) =>
-      isPointOnSegment(point, segment.start, segment.end),
+      isPointNearSegmentEndpoint(point, segment.start, segment.end),
     )
-  const originConnected = touchesWire(origin)
-  const extremityConnected = touchesWire(extremity)
+  const originConnected = touchesWireEndpoint(origin)
+  const extremityConnected = touchesWireEndpoint(extremity)
   const connectedEnd = record.getNumber("CONNECTEDEND")
   const connectsAtExtremity =
     connectedEnd === 2 ||
@@ -1359,6 +1359,19 @@ function getPortConnectionGeometry(
         bodyDirection: getOppositeDirection(originToExtremity),
       }
     : { anchor: origin, bodyDirection: originToExtremity }
+}
+
+function isPointNearSegmentEndpoint(
+  point: AltiumPoint,
+  start: AltiumPoint,
+  end: AltiumPoint,
+): boolean {
+  return isPointNear(point, start) || isPointNear(point, end)
+}
+
+function isPointNear(point: AltiumPoint, other: AltiumPoint): boolean {
+  const tolerance = 1.1
+  return (point.x - other.x) ** 2 + (point.y - other.y) ** 2 <= tolerance ** 2
 }
 
 function getOppositeDirection(direction: CardinalDirection): CardinalDirection {

@@ -324,19 +324,19 @@
     L 527.035930545768,184.702783244697
     Z
   " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.482574363236px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_349__stack1" x="527.9045643995928" y="182.289911428517" fill="rgb(132, 0, 0)" text-anchor="start" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="4.343169269123999px" transform="">IN1</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_352__stack1" d="
-    M 580.904950199459,211.84632416124643
-    L 582.2079009801962,209.43345234506643
-    L 591.5473234900236,209.43345234506643
-    L 591.5473234900236,214.25919597742643
-    L 582.2079009801962,214.25919597742643
+    M 604.5500803856426,211.84632416124643
+    L 603.2471296049054,214.25919597742643
+    L 593.907707095078,214.25919597742643
+    L 593.907707095078,209.43345234506643
+    L 603.2471296049054,209.43345234506643
     Z
-  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.482574363236px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_352__stack1" x="583.076534834021" y="211.84632416124643" fill="rgb(132, 0, 0)" text-anchor="start" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="4.343169269123999px" transform="">IN1</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_353__stack1" d="
-    M 580.904950199459,192.1420490060935
-    L 582.2079009801962,189.7291771899135
-    L 591.5473234900236,189.7291771899135
-    L 591.5473234900236,194.5549208222735
-    L 582.2079009801962,194.5549208222735
+  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.482574363236px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_352__stack1" x="602.3784957510805" y="211.84632416124643" fill="rgb(132, 0, 0)" text-anchor="end" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="4.343169269123999px" transform="">IN1</text><path class="net-label sch-net-label" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_353__stack1" d="
+    M 604.5500803856426,192.1420490060935
+    L 603.2471296049054,194.5549208222735
+    L 593.907707095078,194.5549208222735
+    L 593.907707095078,189.7291771899135
+    L 603.2471296049054,189.7291771899135
     Z
-  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.482574363236px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_353__stack1" x="583.076534834021" y="192.1420490060935" fill="rgb(132, 0, 0)" text-anchor="start" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="4.343169269123999px" transform="">IN3</text>
+  " fill="rgba(255, 255, 255, 0.6)" stroke="rgb(132, 0, 0)" stroke-width="0.482574363236px"/><text class="net-label-text sch-net-label-text" data-circuit-json-type="schematic_net_label" data-schematic-net-label-id="schematic_net_label_altium_353__stack1" x="602.3784957510805" y="192.1420490060935" fill="rgb(132, 0, 0)" text-anchor="end" dominant-baseline="central" font-family="sans-serif" font-variant-numeric="tabular-nums" font-size="4.343169269123999px" transform="">IN3</text>
   </g>
 </svg>
