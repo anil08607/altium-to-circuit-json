@@ -1795,7 +1795,7 @@ function getPowerPortSymbolName(
   direction: CardinalDirection,
 ): string {
   const style = Math.round(record.getNumber("STYLE") ?? 2)
-  if (style === 4) return `digital_ground_${direction}`
+  if (style === 4) return `ground_${direction}`
   if (style === 5) return `ground_${direction}`
   if (style === 6) return `tilted_ground_${direction}`
   return `vcc_${direction}`
