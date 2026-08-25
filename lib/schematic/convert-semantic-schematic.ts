@@ -196,11 +196,16 @@ function convertComponents(params: {
       findOwnedText(ownedRecords, "34", "Designator") ??
       componentRecord.getDecoded("DESIGNATOR") ??
       `U${componentIndex}`
+    // Altium libraries commonly store the human-readable component value in
+    // the named `Value` parameter, while `Comment` may contain a manufacturer
+    // part number (or another library-specific description). Prefer the
+    // explicit value field and retain the older fallbacks for simpler files.
     const value =
-      findOwnedText(ownedRecords, "41", "Comment") ??
-      componentRecord.getDecoded("COMMENT") ??
-      componentRecord.getDecoded("DESIGNITEMID") ??
-      componentRecord.getDecoded("LIBREFERENCE") ??
+      findOwnedText(ownedRecords, "41", "Value")?.trim() ||
+      findOwnedText(ownedRecords, "41", "Comment")?.trim() ||
+      componentRecord.getDecoded("COMMENT")?.trim() ||
+      componentRecord.getDecoded("DESIGNITEMID")?.trim() ||
+      componentRecord.getDecoded("LIBREFERENCE")?.trim() ||
       ""
     const libraryReference =
       componentRecord.getDecoded("LIBREFERENCE") ??
