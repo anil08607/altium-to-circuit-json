@@ -24,6 +24,37 @@ import {
 } from "circuit-json"
 import { parseAndConvertSiUnit } from "format-si-unit"
 import { type SchSymbol, symbols } from "schematic-symbols"
+import {
+  type Bounds,
+  type CardinalDirection,
+  getAveragePoint,
+  getBoundsCenter,
+  getBoundsForPoints,
+  getCorner,
+  getDirectionForVector,
+  getLocation,
+  getPointDistance,
+  getRectangle,
+  getVectorDifference,
+  mergeBounds,
+  pointKey,
+  pointsEqual,
+  scalePoint,
+  subtractPoints,
+} from "./geometry"
+import {
+  isGroundNet,
+  isPowerNet,
+  sanitizeId,
+  segmentKey,
+  uniqueStrings,
+} from "./ids"
+import {
+  classifyComponent,
+  getMosfetVariant,
+  getPrimaryComponentValue,
+  isPolarizedCapacitor,
+} from "./symbols"
 
 export interface SemanticSchematicOptions {
   includeHidden?: boolean
@@ -68,19 +99,10 @@ interface SemanticNetGraph {
   nets: SemanticNet[]
 }
 
-interface Bounds {
-  maxX: number
-  maxY: number
-  minX: number
-  minY: number
-}
-
 interface SchematicSegment {
   end: AltiumPoint
   start: AltiumPoint
 }
-
-type CardinalDirection = "up" | "down" | "left" | "right"
 
 const DIRECTION_BY_ORIENTATION: readonly CardinalDirection[] = [
   "right",
@@ -1051,12 +1073,6 @@ function getEquivalentPortPrunedSegmentKeys(params: {
   return removedSegmentKeys
 }
 
-function segmentKey(start: AltiumPoint, end: AltiumPoint): string {
-  const startKey = pointKey(start)
-  const endKey = pointKey(end)
-  return startKey < endKey ? `${startKey}|${endKey}` : `${endKey}|${startKey}`
-}
-
 function createPortLeadEdges(
   convertedPort: ConvertedPort,
   electricalTerminal: AltiumPoint,
@@ -1583,14 +1599,6 @@ function assignConvertedPortsToSymbolPorts(
   return assignments
 }
 
-function getAveragePoint(points: AltiumPoint[]): AltiumPoint {
-  if (points.length === 0) return { x: 0, y: 0 }
-  return {
-    x: points.reduce((sum, point) => sum + point.x, 0) / points.length,
-    y: points.reduce((sum, point) => sum + point.y, 0) / points.length,
-  }
-}
-
 function compareConvertedPorts(
   left: ConvertedPort,
   right: ConvertedPort,
@@ -1659,17 +1667,6 @@ function normalizeFunctionalPortLabel(value: string): string | undefined {
   return undefined
 }
 
-function getVectorDifference(left: AltiumPoint, right: AltiumPoint): number {
-  const leftLength = Math.hypot(left.x, left.y)
-  const rightLength = Math.hypot(right.x, right.y)
-  if (leftLength === 0 || rightLength === 0) {
-    return Number.POSITIVE_INFINITY
-  }
-  const cosine =
-    (left.x * right.x + left.y * right.y) / (leftLength * rightLength)
-  return 1 - Math.max(-1, Math.min(1, cosine))
-}
-
 function applyNativeSymbolPortGeometry(params: {
   center: AltiumPoint
   selection: SymbolSelection
@@ -1715,97 +1712,6 @@ function applyNativeSymbolPortGeometry(params: {
       convertedPort.schematicPort.side_of_component = directionToSide(direction)
     }
   }
-}
-
-function getPointDistance(left: AltiumPoint, right: AltiumPoint): number {
-  return Math.hypot(left.x - right.x, left.y - right.y)
-}
-
-function getDirectionForVector(vector: AltiumPoint): CardinalDirection {
-  if (Math.abs(vector.x) >= Math.abs(vector.y)) {
-    return vector.x >= 0 ? "right" : "left"
-  }
-  return vector.y >= 0 ? "up" : "down"
-}
-
-function subtractPoints(
-  left: { x: number; y: number },
-  right: { x: number; y: number },
-): AltiumPoint {
-  return { x: left.x - right.x, y: left.y - right.y }
-}
-
-function classifyComponent(params: {
-  designator: string
-  libraryReference: string
-}):
-  | "capacitor"
-  | "crystal"
-  | "diode"
-  | "ferrite_bead"
-  | "inductor"
-  | "led"
-  | "mosfet"
-  | "resistor"
-  | "testpoint"
-  | "unknown" {
-  const { designator, libraryReference } = params
-  const prefix = designator.match(/^[A-Z]+/iu)?.[0]?.toUpperCase() ?? ""
-  const lowerReference = libraryReference.toLowerCase()
-  if (prefix === "TP" || lowerReference.includes("testpoint")) {
-    return "testpoint"
-  }
-  if (
-    prefix === "Y" ||
-    lowerReference.includes("crystal") ||
-    /(?:^|[_-])cry(?:\d|[_-]|$)/iu.test(libraryReference)
-  ) {
-    return "crystal"
-  }
-  if (lowerReference.includes("mosfet")) return "mosfet"
-  if (
-    prefix === "FB" ||
-    prefix === "FL" ||
-    lowerReference.includes("ferrite") ||
-    lowerReference.includes("emifilter_ind")
-  ) {
-    return "ferrite_bead"
-  }
-  if (prefix === "LED" || lowerReference.includes("led")) return "led"
-  if (prefix === "R" || lowerReference.includes("resistor")) return "resistor"
-  if (prefix === "C" || /(?:^|[_-])cap(?:[_-]|$)/iu.test(libraryReference)) {
-    return "capacitor"
-  }
-  if (prefix === "L" || lowerReference.includes("inductor")) return "inductor"
-  if (prefix === "D" || lowerReference.includes("diode")) return "diode"
-  return "unknown"
-}
-
-function getMosfetVariant(libraryReference: string): {
-  channel_type: "n" | "p"
-  mosfet_mode: "depletion" | "enhancement"
-} {
-  const lowerReference = libraryReference.toLowerCase()
-  const isPChannel =
-    /(?:^|[_-])p(?:channel)?(?:[_-]|$)/iu.test(libraryReference) ||
-    lowerReference.includes("pmos") ||
-    lowerReference.includes("csd25")
-  return {
-    channel_type: isPChannel ? "p" : "n",
-    mosfet_mode: lowerReference.includes("depletion")
-      ? "depletion"
-      : "enhancement",
-  }
-}
-
-function isPolarizedCapacitor(libraryReference: string): boolean {
-  return /(?:^|[_-])cap(?:acitor)?[_-]?pol(?:arized)?(?:[_-]|$)/iu.test(
-    libraryReference,
-  )
-}
-
-function getPrimaryComponentValue(value: string): string {
-  return value.split(/[_/\s]+/u).find(Boolean) ?? value
 }
 
 function getPowerPortSymbolName(
@@ -1953,113 +1859,7 @@ function getPortIdAtElectricalPoint(
     : undefined
 }
 
-function getBoundsForPoints(points: AltiumPoint[]): Bounds {
-  if (points.length === 0) return { maxX: 1, maxY: 1, minX: -1, minY: -1 }
-  return {
-    maxX: Math.max(...points.map((point) => point.x)),
-    maxY: Math.max(...points.map((point) => point.y)),
-    minX: Math.min(...points.map((point) => point.x)),
-    minY: Math.min(...points.map((point) => point.y)),
-  }
-}
-
-function mergeBounds(bounds: Bounds[]): Bounds {
-  return {
-    maxX: Math.max(...bounds.map((bound) => bound.maxX)),
-    maxY: Math.max(...bounds.map((bound) => bound.maxY)),
-    minX: Math.min(...bounds.map((bound) => bound.minX)),
-    minY: Math.min(...bounds.map((bound) => bound.minY)),
-  }
-}
-
-function getBoundsCenter(bounds: Bounds): AltiumPoint {
-  return {
-    x: (bounds.minX + bounds.maxX) / 2,
-    y: (bounds.minY + bounds.maxY) / 2,
-  }
-}
-
-function getRectangle(record: AltiumRecord): Bounds | undefined {
-  const location = getLocation(record)
-  const corner = getCorner(record)
-  if (!location || !corner) return undefined
-  return {
-    maxX: Math.max(location.x, corner.x),
-    maxY: Math.max(location.y, corner.y),
-    minX: Math.min(location.x, corner.x),
-    minY: Math.min(location.y, corner.y),
-  }
-}
-
-function getLocation(record: AltiumRecord): AltiumPoint | undefined {
-  const x = getCoordinate(record, "LOCATION.X")
-  const y = getCoordinate(record, "LOCATION.Y")
-  return x === undefined || y === undefined ? undefined : { x, y }
-}
-
-function getCorner(record: AltiumRecord): AltiumPoint | undefined {
-  const x = getCoordinate(record, "CORNER.X")
-  const y = getCoordinate(record, "CORNER.Y")
-  return x === undefined || y === undefined ? undefined : { x, y }
-}
-
-function getCoordinate(record: AltiumRecord, key: string): number | undefined {
-  const raw = record.getCaseInsensitive(key)
-  if (raw === undefined) return undefined
-  const integer = Number(raw)
-  if (!Number.isFinite(integer)) return undefined
-  const fractionRaw = record.getCaseInsensitive(`${key}_FRAC`)
-  if (fractionRaw === undefined) return integer
-  const fraction = Number(`0.${fractionRaw.replace(/^[+-]/u, "")}`)
-  if (!Number.isFinite(fraction)) return integer
-  return integer < 0 ? integer - fraction : integer + fraction
-}
-
 function parsePinNumber(value: string): number | undefined {
   const parsed = Number(value)
   return Number.isInteger(parsed) && parsed >= 0 ? parsed : undefined
-}
-
-function scalePoint(point: AltiumPoint, scale: number): AltiumPoint {
-  return { x: point.x * scale, y: point.y * scale }
-}
-
-function pointKey(point: AltiumPoint): string {
-  return `${point.x.toFixed(6)},${point.y.toFixed(6)}`
-}
-
-function pointsEqual(
-  left: AltiumPoint,
-  right: AltiumPoint | undefined,
-): boolean {
-  return (
-    right !== undefined &&
-    Math.abs(left.x - right.x) < 0.000001 &&
-    Math.abs(left.y - right.y) < 0.000001
-  )
-}
-
-function uniqueStrings(values: Array<string | undefined>): string[] {
-  return [...new Set(values.filter((value): value is string => Boolean(value)))]
-}
-
-function sanitizeId(value: string): string {
-  const sanitized = value
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/gu, "_")
-    .replace(/^_+|_+$/gu, "")
-  return sanitized || "unnamed"
-}
-
-function isGroundNet(name: string): boolean {
-  return /(?:^|[_+-])(?:[adp]?gnd|ground)(?:$|[_+\d-])/iu.test(name)
-}
-
-function isPowerNet(name: string): boolean {
-  return (
-    isGroundNet(name) ||
-    /(?:^|[_+-])(?:vcc|vdd|vss)(?:$|[a-z0-9_+-])/iu.test(name) ||
-    /(?:^|[_+-])(?:vin|vout|pwr|power)(?:$|[_+\d-])/iu.test(name)
-  )
 }
