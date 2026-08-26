@@ -201,12 +201,12 @@ function getCourtyardRecordPoints(record: AltiumRecord): AltiumPoint[] {
   }
   if (record instanceof AltiumArcRecord) {
     return record.center && record.radiusMils
-      ? approximateArc(
-          record.center,
-          record.radiusMils,
-          record.startAngle,
-          record.endAngle,
-        )
+      ? approximateArc({
+          center: record.center,
+          radius: record.radiusMils,
+          startAngle: record.startAngle,
+          endAngle: record.endAngle,
+        })
       : []
   }
   if (record instanceof AltiumRegionRecord) {
@@ -528,7 +528,13 @@ function convertPad(
         shape: "hole_with_polygon_pad",
         hole_shape: "circle",
         hole_diameter: Math.max(holeDiameter, MILS_TO_MILLIMETERS),
-        pad_outline: createOctagonPoints(x, y, width, height, record.rotation),
+        pad_outline: createOctagonPoints({
+          x,
+          y,
+          width,
+          height,
+          rotation: record.rotation,
+        }),
         hole_offset_x: 0,
         hole_offset_y: 0,
         x,
@@ -585,7 +591,13 @@ function convertPad(
     return {
       ...base,
       shape: "polygon",
-      points: createOctagonPoints(x, y, width, height, record.rotation),
+      points: createOctagonPoints({
+        x,
+        y,
+        width,
+        height,
+        rotation: record.rotation,
+      }),
     }
   }
   if (shape === "ROUND" || shape === "CIRCLE" || shape === "OVAL") {
@@ -645,12 +657,12 @@ function convertSilkscreenArc(
   index: number,
 ): PcbSilkscreenPath | undefined {
   if (!record.center || !record.radiusMils) return undefined
-  const points = approximateArc(
-    record.center,
-    record.radiusMils,
-    record.startAngle,
-    record.endAngle,
-  )
+  const points = approximateArc({
+    center: record.center,
+    radius: record.radiusMils,
+    startAngle: record.startAngle,
+    endAngle: record.endAngle,
+  })
   return {
     type: "pcb_silkscreen_path",
     pcb_silkscreen_path_id: `pcb_silkscreen_path_altium_${index}`,
@@ -809,12 +821,17 @@ function withNumberedPoints(
   }
 }
 
-function approximateArc(
-  center: AltiumPoint,
-  radius: number,
-  startAngle: number,
-  endAngle: number,
-): AltiumPoint[] {
+function approximateArc({
+  center,
+  radius,
+  startAngle,
+  endAngle,
+}: {
+  center: AltiumPoint
+  radius: number
+  startAngle: number
+  endAngle: number
+}): AltiumPoint[] {
   const sweep = endAngle - startAngle || 360
   const segments = Math.max(8, Math.ceil(Math.abs(sweep) / 7.5))
   return Array.from({ length: segments + 1 }, (_, index) => {
@@ -827,13 +844,19 @@ function approximateArc(
   })
 }
 
-function createOctagonPoints(
-  x: number,
-  y: number,
-  width: number,
-  height: number,
-  rotation: number,
-): Array<{ x: number; y: number }> {
+function createOctagonPoints({
+  x,
+  y,
+  width,
+  height,
+  rotation,
+}: {
+  x: number
+  y: number
+  width: number
+  height: number
+  rotation: number
+}): Array<{ x: number; y: number }> {
   const halfWidth = width / 2
   const halfHeight = height / 2
   const chamfer = Math.min(width, height) / 4

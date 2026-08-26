@@ -271,7 +271,16 @@ function convertSchematicRecord(
     const location = getLocation(record)
     const corner = getCorner(record)
     if (!location || !corner) return []
-    return [createLine(index, location, corner, color, strokeWidth, scale)]
+    return [
+      createLine({
+        index,
+        start: location,
+        end: corner,
+        color,
+        strokeWidth,
+        scale,
+      }),
+    ]
   }
 
   if (kind === "10" || kind === "14") {
@@ -371,7 +380,7 @@ function convertSchematicRecord(
   }
 
   if (kind === "2") {
-    return convertPin(record, index, context, options, color)
+    return convertPin({ record, index, context, options, color })
   }
 
   if (kind === "29") {
@@ -403,33 +412,33 @@ function convertSchematicRecord(
     const radius = 4
     const noErcStrokeWidth = Math.max(scale, 0.02)
     return [
-      createLine(
+      createLine({
         index,
-        { x: location.x - radius, y: location.y - radius },
-        { x: location.x + radius, y: location.y + radius },
+        start: { x: location.x - radius, y: location.y - radius },
+        end: { x: location.x + radius, y: location.y + radius },
         color,
-        noErcStrokeWidth,
+        strokeWidth: noErcStrokeWidth,
         scale,
-        "a",
-      ),
-      createLine(
+        suffix: "a",
+      }),
+      createLine({
         index,
-        { x: location.x + radius, y: location.y - radius },
-        { x: location.x - radius, y: location.y + radius },
+        start: { x: location.x + radius, y: location.y - radius },
+        end: { x: location.x - radius, y: location.y + radius },
         color,
-        noErcStrokeWidth,
+        strokeWidth: noErcStrokeWidth,
         scale,
-        "b",
-      ),
+        suffix: "b",
+      }),
     ]
   }
 
   if (kind === "17") {
-    return convertPowerPort(record, index, context, options, color)
+    return convertPowerPort({ record, index, context, options, color })
   }
 
   if (kind === "18") {
-    return convertPort(record, index, context, options, color)
+    return convertPort({ record, index, context, options, color })
   }
 
   if (kind === "4" || kind === "25" || kind === "34" || kind === "41") {
@@ -441,7 +450,7 @@ function convertSchematicRecord(
       record.getDecoded("DESIGNATOR")
     const location = getLocation(record)
     if (!text || !location) return []
-    return [createText(record, index, text, location, color, context)]
+    return [createText({ record, index, text, location, color, context })]
   }
 
   if (kind === "28") {
@@ -482,19 +491,19 @@ function convertSchematicRecord(
       "#1f2937",
     )
     const elements: AnyCircuitElement[] = visibleLines.map((line, lineIndex) =>
-      createDirectText(
-        `schematic_text_frame_line_altium_${index}_${lineIndex}`,
-        line,
-        {
+      createDirectText({
+        id: `schematic_text_frame_line_altium_${index}_${lineIndex}`,
+        text: line,
+        location: {
           x: textX,
           y: rectangle.maxY - margin - lineIndex * lineHeight,
         },
         fontSize,
-        textColor,
+        color: textColor,
         scale,
-        0,
-        `top_${horizontalAnchor}` as SchematicText["anchor"],
-      ),
+        rotation: 0,
+        anchor: `top_${horizontalAnchor}` as SchematicText["anchor"],
+      }),
     )
 
     const isSolid = record.getBoolean("ISSOLID") === true
@@ -531,13 +540,19 @@ function convertSchematicRecord(
   return []
 }
 
-function convertPin(
-  record: AltiumRecord,
-  index: number,
-  context: SchematicContext,
-  options: ConvertAltiumSchDocOptions,
-  color: string,
-): AnyCircuitElement[] {
+function convertPin({
+  record,
+  index,
+  context,
+  options,
+  color,
+}: {
+  record: AltiumRecord
+  index: number
+  context: SchematicContext
+  options: ConvertAltiumSchDocOptions
+  color: string
+}): AnyCircuitElement[] {
   const location = getLocation(record)
   if (!location) return []
   const pinConglomerate = record.getNumber("PINCONGLOMERATE")
@@ -563,7 +578,15 @@ function convertPin(
     y: location.y + direction.y * length,
   }
   const elements: AnyCircuitElement[] = [
-    createLine(index, location, end, color, 0.1, context.scale, "pin"),
+    createLine({
+      index,
+      start: location,
+      end,
+      color,
+      strokeWidth: 0.1,
+      scale: context.scale,
+      suffix: "pin",
+    }),
   ]
   if (options.includeText === false) return elements
 
@@ -581,48 +604,54 @@ function convertPin(
 
   if (showName && name) {
     elements.push(
-      createDirectText(
-        `schematic_pin_name_altium_${index}`,
-        name,
-        {
+      createDirectText({
+        id: `schematic_pin_name_altium_${index}`,
+        text: name,
+        location: {
           x: location.x - direction.x * textOffset,
           y: location.y - direction.y * textOffset,
         },
-        6,
+        fontSize: 6,
         color,
-        context.scale,
+        scale: context.scale,
         rotation,
-        nameAnchor,
-      ),
+        anchor: nameAnchor,
+      }),
     )
   }
   if (showDesignator && designator) {
     elements.push(
-      createDirectText(
-        `schematic_pin_designator_altium_${index}`,
-        designator,
-        {
+      createDirectText({
+        id: `schematic_pin_designator_altium_${index}`,
+        text: designator,
+        location: {
           x: location.x + direction.x * textOffset,
           y: location.y + direction.y * textOffset,
         },
-        6,
+        fontSize: 6,
         color,
-        context.scale,
+        scale: context.scale,
         rotation,
-        designatorAnchor,
-      ),
+        anchor: designatorAnchor,
+      }),
     )
   }
   return elements
 }
 
-function convertPowerPort(
-  record: AltiumRecord,
-  index: number,
-  context: SchematicContext,
-  options: ConvertAltiumSchDocOptions,
-  color: string,
-): AnyCircuitElement[] {
+function convertPowerPort({
+  record,
+  index,
+  context,
+  options,
+  color,
+}: {
+  record: AltiumRecord
+  index: number
+  context: SchematicContext
+  options: ConvertAltiumSchDocOptions
+  color: string
+}): AnyCircuitElement[] {
   const location = getLocation(record)
   if (!location) return []
   const orientation =
@@ -644,37 +673,37 @@ function convertPowerPort(
 
   if (style === 2) {
     elements.push(
-      createLine(
+      createLine({
         index,
-        location,
-        point(8),
+        start: location,
+        end: point(8),
         color,
-        0.1,
-        context.scale,
-        "power_port_stem",
-      ),
-      createLine(
+        strokeWidth: 0.1,
+        scale: context.scale,
+        suffix: "power_port_stem",
+      }),
+      createLine({
         index,
-        point(8, -5),
-        point(8, 5),
+        start: point(8, -5),
+        end: point(8, 5),
         color,
-        0.1,
-        context.scale,
-        "power_port_bar",
-      ),
+        strokeWidth: 0.1,
+        scale: context.scale,
+        suffix: "power_port_bar",
+      }),
     )
     labelDistance = 12
   } else if (style === 5) {
     elements.push(
-      createLine(
+      createLine({
         index,
-        location,
-        point(4),
+        start: location,
+        end: point(4),
         color,
-        0.1,
-        context.scale,
-        "power_port_stem",
-      ),
+        strokeWidth: 0.1,
+        scale: context.scale,
+        suffix: "power_port_stem",
+      }),
       {
         type: "schematic_path",
         schematic_path_id: `schematic_power_port_altium_${index}`,
@@ -691,66 +720,66 @@ function convertPowerPort(
     labelDistance = 16
   } else if (style === 4) {
     elements.push(
-      createLine(
+      createLine({
         index,
-        location,
-        point(4),
+        start: location,
+        end: point(4),
         color,
-        0.1,
-        context.scale,
-        "power_port_stem",
-      ),
+        strokeWidth: 0.1,
+        scale: context.scale,
+        suffix: "power_port_stem",
+      }),
       ...[
         { along: 4, halfWidth: 7 },
         { along: 8, halfWidth: 4.5 },
         { along: 12, halfWidth: 2 },
       ].map(({ along, halfWidth }, lineIndex) =>
-        createLine(
+        createLine({
           index,
-          point(along, -halfWidth),
-          point(along, halfWidth),
+          start: point(along, -halfWidth),
+          end: point(along, halfWidth),
           color,
-          0.1,
-          context.scale,
-          `power_port_ground_${lineIndex}`,
-        ),
+          strokeWidth: 0.1,
+          scale: context.scale,
+          suffix: `power_port_ground_${lineIndex}`,
+        }),
       ),
     )
     labelDistance = 16
   } else if (style === 6) {
     elements.push(
-      createLine(
+      createLine({
         index,
-        location,
-        point(4),
+        start: location,
+        end: point(4),
         color,
-        0.1,
-        context.scale,
-        "power_port_stem",
-      ),
-      createLine(
+        strokeWidth: 0.1,
+        scale: context.scale,
+        suffix: "power_port_stem",
+      }),
+      createLine({
         index,
-        point(4, -7),
-        point(4, 7),
+        start: point(4, -7),
+        end: point(4, 7),
         color,
-        0.1,
-        context.scale,
-        "power_port_chassis_bar",
-      ),
+        strokeWidth: 0.1,
+        scale: context.scale,
+        suffix: "power_port_chassis_bar",
+      }),
       ...[
         { from: -7, to: -9 },
         { from: 0, to: -2 },
         { from: 7, to: 5 },
       ].map(({ from, to }, lineIndex) =>
-        createLine(
+        createLine({
           index,
-          point(4, from),
-          point(9, to),
+          start: point(4, from),
+          end: point(9, to),
           color,
-          0.1,
-          context.scale,
-          `power_port_chassis_${lineIndex}`,
-        ),
+          strokeWidth: 0.1,
+          scale: context.scale,
+          suffix: `power_port_chassis_${lineIndex}`,
+        }),
       ),
     )
     labelDistance = 14
@@ -785,28 +814,34 @@ function convertPowerPort(
         ? "center_left"
         : "center_right"
     elements.push(
-      createDirectText(
-        `schematic_power_port_text_altium_${index}`,
+      createDirectText({
+        id: `schematic_power_port_text_altium_${index}`,
         text,
-        point(labelDistance),
-        getFontSize(record, context),
+        location: point(labelDistance),
+        fontSize: getFontSize(record, context),
         color,
-        context.scale,
-        0,
+        scale: context.scale,
+        rotation: 0,
         anchor,
-      ),
+      }),
     )
   }
   return elements
 }
 
-function convertPort(
-  record: AltiumRecord,
-  index: number,
-  context: SchematicContext,
-  options: ConvertAltiumSchDocOptions,
-  color: string,
-): AnyCircuitElement[] {
+function convertPort({
+  record,
+  index,
+  context,
+  options,
+  color,
+}: {
+  record: AltiumRecord
+  index: number
+  context: SchematicContext
+  options: ConvertAltiumSchDocOptions
+  color: string
+}): AnyCircuitElement[] {
   const location = getLocation(record)
   if (!location) return []
   const width = Math.max(Number(record.getCaseInsensitive("WIDTH") ?? 16), 10)
@@ -862,16 +897,16 @@ function convertPort(
   const name = record.getDecoded("NAME")
   if (name && options.includeText !== false) {
     elements.push(
-      createDirectText(
-        `schematic_port_text_altium_${index}`,
-        name,
-        { x: location.x + width / 2, y: location.y },
-        getFontSize(record, context),
-        altiumColorToCss(record.getCaseInsensitive("TEXTCOLOR"), color),
-        context.scale,
-        0,
-        "center",
-      ),
+      createDirectText({
+        id: `schematic_port_text_altium_${index}`,
+        text: name,
+        location: { x: location.x + width / 2, y: location.y },
+        fontSize: getFontSize(record, context),
+        color: altiumColorToCss(record.getCaseInsensitive("TEXTCOLOR"), color),
+        scale: context.scale,
+        rotation: 0,
+        anchor: "center",
+      }),
     )
   }
   return elements
@@ -897,15 +932,23 @@ function createSheetBorder(
   }
 }
 
-function createLine(
-  index: number,
-  start: AltiumPoint,
-  end: AltiumPoint,
-  color: string,
-  strokeWidth: number,
-  scale: number,
+function createLine({
+  index,
+  start,
+  end,
+  color,
+  strokeWidth,
+  scale,
   suffix = "line",
-): SchematicLine {
+}: {
+  index: number
+  start: AltiumPoint
+  end: AltiumPoint
+  color: string
+  strokeWidth: number
+  scale: number
+  suffix?: string
+}): SchematicLine {
   return {
     type: "schematic_line",
     schematic_line_id: `schematic_line_altium_${index}_${suffix}`,
@@ -920,38 +963,55 @@ function createLine(
   }
 }
 
-function createText(
-  record: AltiumRecord,
-  index: number,
-  text: string,
-  location: AltiumPoint,
-  color: string,
-  context: SchematicContext,
-  anchorOverride?: SchematicText["anchor"],
-): SchematicText {
+function createText({
+  record,
+  index,
+  text,
+  location,
+  color,
+  context,
+  anchorOverride,
+}: {
+  record: AltiumRecord
+  index: number
+  text: string
+  location: AltiumPoint
+  color: string
+  context: SchematicContext
+  anchorOverride?: SchematicText["anchor"]
+}): SchematicText {
   const positioning = getTextPositioning(record)
-  return createDirectText(
-    `schematic_text_altium_${index}`,
+  return createDirectText({
+    id: `schematic_text_altium_${index}`,
     text,
     location,
-    getFontSize(record, context),
+    fontSize: getFontSize(record, context),
     color,
-    context.scale,
-    positioning.rotation,
-    anchorOverride ?? positioning.anchor,
-  )
+    scale: context.scale,
+    rotation: positioning.rotation,
+    anchor: anchorOverride ?? positioning.anchor,
+  })
 }
 
-function createDirectText(
-  id: string,
-  text: string,
-  location: AltiumPoint,
-  fontSize: number,
-  color: string,
-  scale: number,
-  rotation: number,
-  anchor: SchematicText["anchor"],
-): SchematicText {
+function createDirectText({
+  id,
+  text,
+  location,
+  fontSize,
+  color,
+  scale,
+  rotation,
+  anchor,
+}: {
+  id: string
+  text: string
+  location: AltiumPoint
+  fontSize: number
+  color: string
+  scale: number
+  rotation: number
+  anchor: SchematicText["anchor"]
+}): SchematicText {
   return {
     type: "schematic_text",
     schematic_text_id: id,
