@@ -1,6 +1,6 @@
 {
   "name": "altium-to-circuit-json",
-  "version": "0.0.18",
+  "version": "0.0.19",
   "description": "Convert Altium schematic and PCB documents into Circuit JSON",
   "type": "module",
   "main": "./dist/index.js",
