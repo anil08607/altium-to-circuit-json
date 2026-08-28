@@ -22,7 +22,7 @@ import {
   source_simple_mosfet,
   source_simple_resistor,
 } from "circuit-json"
-import { parseAndConvertSiUnit } from "format-si-unit"
+import { type BaseTscircuitUnit, parseAndConvertSiUnit } from "format-si-unit"
 import { type SchSymbol, symbols } from "schematic-symbols"
 import {
   type Bounds,
@@ -464,35 +464,56 @@ function createSourceComponent(params: {
   }
 
   if (classification === "resistor") {
-    const parsed = source_simple_resistor.safeParse({
-      ...common,
-      display_resistance: value || undefined,
-      ftype: "simple_resistor",
-      resistance: primaryValue || 0,
+    const resistance = parseFiniteComponentValue({
+      componentUnit: "Ω",
+      componentValue: primaryValue,
     })
-    if (parsed.success) return parsed.data
+    if (resistance !== undefined) {
+      const parsed = source_simple_resistor.safeParse({
+        ...common,
+        display_resistance: value || undefined,
+        ftype: "simple_resistor",
+        resistance,
+      })
+      if (parsed.success) return parsed.data
+    }
   }
   if (classification === "capacitor") {
-    const parsed = source_simple_capacitor.safeParse({
-      ...common,
-      display_capacitance: value || undefined,
-      ftype: "simple_capacitor",
-      capacitance: primaryValue || 0,
+    const capacitance = parseFiniteComponentValue({
+      componentUnit: "F",
+      componentValue: primaryValue,
     })
-    if (parsed.success) return parsed.data
+    if (capacitance !== undefined) {
+      const parsed = source_simple_capacitor.safeParse({
+        ...common,
+        display_capacitance: value || undefined,
+        ftype: "simple_capacitor",
+        capacitance,
+      })
+      if (parsed.success) return parsed.data
+    }
   }
   if (classification === "inductor") {
-    const parsed = source_simple_inductor.safeParse({
-      ...common,
-      display_inductance: value || undefined,
-      ftype: "simple_inductor",
-      inductance: primaryValue || 0,
+    const inductance = parseFiniteComponentValue({
+      componentUnit: "H",
+      componentValue: primaryValue,
     })
-    if (parsed.success) return parsed.data
+    if (inductance !== undefined) {
+      const parsed = source_simple_inductor.safeParse({
+        ...common,
+        display_inductance: value || undefined,
+        ftype: "simple_inductor",
+        inductance,
+      })
+      if (parsed.success) return parsed.data
+    }
   }
   if (classification === "crystal" && (pinCount === 2 || pinCount === 4)) {
-    const frequency = parseAndConvertSiUnit(value, "Hz").value
-    if (typeof frequency === "number" && Number.isFinite(frequency)) {
+    const frequency = parseFiniteComponentValue({
+      componentUnit: "Hz",
+      componentValue: value,
+    })
+    if (frequency !== undefined) {
       const parsed = source_simple_crystal.safeParse({
         ...common,
         frequency,
@@ -527,6 +548,26 @@ function createSourceComponent(params: {
     ...common,
     ftype,
   } satisfies SourceComponentBase
+}
+
+function parseFiniteComponentValue({
+  componentUnit,
+  componentValue,
+}: {
+  componentUnit: BaseTscircuitUnit
+  componentValue: string
+}): number | undefined {
+  const parsedComponentValue = parseAndConvertSiUnit(
+    componentValue,
+    componentUnit,
+  ).value
+  if (
+    typeof parsedComponentValue !== "number" ||
+    !Number.isFinite(parsedComponentValue)
+  ) {
+    return undefined
+  }
+  return parsedComponentValue
 }
 
 function createComponentText(params: {

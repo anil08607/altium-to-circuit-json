@@ -62,11 +62,11 @@ test(
       viewport: boardViewport,
       width: 800,
     })
-    const comparisonSvg = stackAltiumAndCircuitJsonSvgs(
+    const comparisonSvg = stackAltiumAndCircuitJsonSvgs({
       altiumSvg,
       circuitJsonSvg,
-      title,
-    )
+      label: title,
+    })
 
     await expect(comparisonSvg).toMatchSvgSnapshot(import.meta.path)
   },

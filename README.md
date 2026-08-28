@@ -94,6 +94,10 @@ bun run test:update-svg
 
 Every imported reference used by the test suite has a side-by-side SVG snapshot. The committed fixtures are generated from pinned upstream URLs and are not stored in this repository.
 
+The real-world PCB corpus covers NodeMCU ESP-12, EBAZ4205, HERON Payload SSM,
+SimpleFOC Mini, and SimpleFOC Shield V3. The schematic corpus covers NodeMCU,
+HERON PAY-SSM and Systems PCB, SimpleFOC Mini, and SimpleFOC Shield V3.
+
 The TI SPRCAL9 / TMDS62LEVM Rev. B regression corpus includes all 57
 schematic sheets and a top-copper PCB comparison. Its large downloaded source
 files are checksum-verified and cached in CI. To also write the complete

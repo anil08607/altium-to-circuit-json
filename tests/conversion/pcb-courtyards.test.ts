@@ -30,11 +30,11 @@ test("repro: Mechanical 15/16 courtyards are missing from Circuit JSON", async (
     showCourtyards: true,
     width: 800,
   })
-  const comparisonSvg = stackAltiumAndCircuitJsonSvgs(
+  const comparisonSvg = stackAltiumAndCircuitJsonSvgs({
     altiumSvg,
     circuitJsonSvg,
-    "PCB courtyards",
-  )
+    label: "PCB courtyards",
+  })
 
   await expect(comparisonSvg).toMatchSvgSnapshot(import.meta.path)
 })

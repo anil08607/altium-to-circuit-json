@@ -3,18 +3,15 @@ import { createOpenSourceSchematicComparison } from "../helpers/create-open-sour
 import { expectValidImportedSchematic } from "../helpers/expect-valid-imported-schematic"
 
 test(
-  "SimpleFOC Mini schematic: altiumts SVG on the left, Circuit JSON SVG on the right",
+  "HERON systems PCB schematic: altiumts SVG on the left, Circuit JSON SVG on the right",
   async () => {
     const { circuitJson, circuitJsonSvg, comparisonSvg } =
       await createOpenSourceSchematicComparison({
-        filename: "simplefocmini-2024-04-26.SchDoc",
-        schematicName: "SimpleFOC Mini",
+        filename: "heron-systems-pcb.SchDoc",
+        schematicName: "HERON systems PCB",
       })
 
-    expectValidImportedSchematic({
-      circuitJson,
-      circuitJsonSvg,
-    })
+    expectValidImportedSchematic({ circuitJson, circuitJsonSvg })
     await expect(comparisonSvg).toMatchSvgSnapshot(import.meta.path)
   },
   { timeout: 40_000 },

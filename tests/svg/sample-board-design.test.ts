@@ -52,11 +52,11 @@ test(
     const circuitJsonSvg = convertCircuitJsonToPcbSvg(circuitJson, {
       matchBoardAspectRatio: true,
     })
-    const comparisonSvg = stackAltiumAndCircuitJsonSvgs(
+    const comparisonSvg = stackAltiumAndCircuitJsonSvgs({
       altiumSvg,
       circuitJsonSvg,
-      "sample board",
-    )
+      label: "sample board",
+    })
 
     await expect(comparisonSvg).toMatchSvgSnapshot(import.meta.path)
   },

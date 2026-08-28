@@ -46,11 +46,11 @@ for (const sheetNumber of TI_TMDS62LEVM_SCHEMATIC_SHEET_NUMBERS) {
       expect(circuitJsonSvg).not.toContain("Could not match ports")
       expect(circuitJsonSvg).not.toContain("Symbol not found")
       expect(circuitJsonSvg).not.toContain("NaN")
-      const comparisonSvg = stackAltiumAndCircuitJsonSvgs(
+      const comparisonSvg = stackAltiumAndCircuitJsonSvgs({
         altiumSvg,
         circuitJsonSvg,
-        title,
-      )
+        label: title,
+      })
 
       await expect(comparisonSvg).toMatchSvgSnapshot(
         import.meta.path,

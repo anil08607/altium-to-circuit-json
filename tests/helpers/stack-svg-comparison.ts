@@ -1,10 +1,14 @@
 import { stackSvgsHorizontally } from "stack-svgs"
 
-export function stackAltiumAndCircuitJsonSvgs(
-  altiumSvg: string,
-  circuitJsonSvg: string,
-  label: string,
-): string {
+export function stackAltiumAndCircuitJsonSvgs({
+  altiumSvg,
+  circuitJsonSvg,
+  label,
+}: {
+  altiumSvg: string
+  circuitJsonSvg: string
+  label: string
+}): string {
   return stackSvgsHorizontally([altiumSvg, circuitJsonSvg], {
     gap: 24,
     normalizeSize: true,
