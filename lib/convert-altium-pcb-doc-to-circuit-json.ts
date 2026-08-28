@@ -31,6 +31,8 @@ import type {
   PcbTrace,
   PcbVia,
 } from "circuit-json"
+import { getPreferredPcbBoardOutline } from "./pcb/get-board-outline"
+import { stitchConnectedAltiumPaths } from "./pcb/stitch-connected-paths"
 
 const MILS_TO_MILLIMETERS = 0.0254
 const BOARD_ID = "pcb_board_altium"
@@ -231,47 +233,12 @@ function stitchCourtyardPaths(paths: CourtyardPath[]): CourtyardPath[] {
 }
 
 function stitchCourtyardPathGroup(group: CourtyardPath[]): CourtyardPath[] {
-  const remaining = [...group]
-  const stitched: CourtyardPath[] = []
-  while (remaining.length > 0) {
-    const first = remaining.shift()
-    if (!first) break
-    const path = { ...first, points: [...first.points] }
-    while (appendConnectedCourtyardPath(path, remaining)) {
-      // Continue until no segment can extend either end of this path.
-    }
-    stitched.push(path)
-  }
-  return stitched
-}
-
-function appendConnectedCourtyardPath(
-  stitched: CourtyardPath,
-  remaining: CourtyardPath[],
-): boolean {
-  const stitchedStart = stitched.points[0]
-  const stitchedEnd = stitched.points.at(-1)
-  if (!stitchedStart || !stitchedEnd) return false
-
-  for (const [index, candidate] of remaining.entries()) {
-    const candidateStart = candidate.points[0]
-    const candidateEnd = candidate.points.at(-1)
-    if (!candidateStart || !candidateEnd) continue
-    if (altiumPointsApproximatelyEqual(stitchedEnd, candidateStart)) {
-      stitched.points.push(...candidate.points.slice(1))
-    } else if (altiumPointsApproximatelyEqual(stitchedEnd, candidateEnd)) {
-      stitched.points.push(...candidate.points.toReversed().slice(1))
-    } else if (altiumPointsApproximatelyEqual(stitchedStart, candidateEnd)) {
-      stitched.points.unshift(...candidate.points.slice(0, -1))
-    } else if (altiumPointsApproximatelyEqual(stitchedStart, candidateStart)) {
-      stitched.points.unshift(...candidate.points.toReversed().slice(0, -1))
-    } else {
-      continue
-    }
-    remaining.splice(index, 1)
-    return true
-  }
-  return false
+  const first = group[0]
+  if (!first) return []
+  return stitchConnectedAltiumPaths({
+    paths: group.map((path) => path.points),
+    maxEndpointGapMils: 0.01,
+  }).map((points) => ({ ...first, points }))
 }
 
 function deduplicateCourtyardPaths(paths: CourtyardPath[]): CourtyardPath[] {
@@ -324,10 +291,10 @@ function altiumPointsApproximatelyEqual(
 }
 
 function createBoard(document: AltiumPcbDocument): PcbBoard {
-  const outline = document.boardGeometry.outline.points.map(toMillimeterPoint)
+  const altiumOutline = getPreferredPcbBoardOutline(document)
+  const outline = altiumOutline.map(toMillimeterPoint)
   const bounds =
-    getAltiumBounds(document.boardGeometry.outline.points) ??
-    getFallbackPcbBounds(document.records)
+    getAltiumBounds(altiumOutline) ?? getFallbackPcbBounds(document.records)
   const width = Math.max(milsToMillimeters(bounds.maxX - bounds.minX), 0.1)
   const height = Math.max(milsToMillimeters(bounds.maxY - bounds.minY), 0.1)
   const numLayers = document.board
