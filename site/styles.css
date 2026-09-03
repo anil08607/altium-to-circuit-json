@@ -45,13 +45,16 @@ button:focus-visible {
   border-radius: 0.9rem;
   background: #ffffff;
   box-shadow: 0 10px 30px rgb(15 23 42 / 4%);
-  overflow: hidden;
 }
 .control-panel {
   padding: 1.25rem;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
 }
 .viewer-panel {
   min-height: 38rem;
+  overflow: hidden;
 }
 .eyebrow {
   color: #4b5563;
