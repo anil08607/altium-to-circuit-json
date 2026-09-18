@@ -407,6 +407,17 @@ function convertPad(
   const shape = normalizeShape(record.shape)
   const id = `altium_${index}`
 
+  const getPadCornerRadiusOrChamfer = () => {
+    const absoluteMils = parseAltiumMeasurementToMils(record.getCaseInsensitive("CORNERRADIUS"))
+    if (absoluteMils !== undefined) return milsToMillimeters(absoluteMils)
+    const percentStr = record.getCaseInsensitive("CORNERRADIUS%")
+    if (percentStr !== undefined) {
+      const percent = Number(percentStr)
+      if (!isNaN(percent)) return (Math.min(width, height) * percent) / 200
+    }
+    return undefined
+  }
+
   if (record.plated === false && holeDiameter > 0) {
     return {
       type: "pcb_hole",
@@ -484,7 +495,7 @@ function convertPad(
         rect_pad_width: width,
         rect_pad_height: height,
         rect_border_radius: shape.includes("ROUNDRECT")
-          ? Math.min(width, height) * 0.18
+          ? (getPadCornerRadiusOrChamfer() ?? Math.min(width, height) * 0.18)
           : 0,
         rect_ccw_rotation: record.rotation,
         hole_offset_x: 0,
@@ -508,6 +519,7 @@ function convertPad(
           width,
           height,
           rotation: record.rotation,
+          chamfer: getPadCornerRadiusOrChamfer(),
         }),
         hole_offset_x: 0,
         hole_offset_y: 0,
@@ -571,6 +583,7 @@ function convertPad(
         width,
         height,
         rotation: record.rotation,
+        chamfer: getPadCornerRadiusOrChamfer(),
       }),
     }
   }
@@ -597,7 +610,7 @@ function convertPad(
   }
 
   const cornerRadius = shape.includes("ROUNDRECT")
-    ? Math.min(width, height) * 0.18
+    ? (getPadCornerRadiusOrChamfer() ?? Math.min(width, height) * 0.18)
     : undefined
   return record.rotation === 0
     ? { ...base, shape: "rect", width, height, corner_radius: cornerRadius }
@@ -814,25 +827,27 @@ function createOctagonPoints({
   width,
   height,
   rotation,
+  chamfer,
 }: {
   x: number
   y: number
   width: number
   height: number
   rotation: number
+  chamfer?: number
 }): Array<{ x: number; y: number }> {
   const halfWidth = width / 2
   const halfHeight = height / 2
-  const chamfer = Math.min(width, height) / 4
+  const actualChamfer = chamfer ?? Math.min(width, height) / 4
   const points = [
-    { x: -halfWidth + chamfer, y: -halfHeight },
-    { x: halfWidth - chamfer, y: -halfHeight },
-    { x: halfWidth, y: -halfHeight + chamfer },
-    { x: halfWidth, y: halfHeight - chamfer },
-    { x: halfWidth - chamfer, y: halfHeight },
-    { x: -halfWidth + chamfer, y: halfHeight },
-    { x: -halfWidth, y: halfHeight - chamfer },
-    { x: -halfWidth, y: -halfHeight + chamfer },
+    { x: -halfWidth + actualChamfer, y: -halfHeight },
+    { x: halfWidth - actualChamfer, y: -halfHeight },
+    { x: halfWidth, y: -halfHeight + actualChamfer },
+    { x: halfWidth, y: halfHeight - actualChamfer },
+    { x: halfWidth - actualChamfer, y: halfHeight },
+    { x: -halfWidth + actualChamfer, y: halfHeight },
+    { x: -halfWidth, y: halfHeight - actualChamfer },
+    { x: -halfWidth, y: -halfHeight + actualChamfer },
   ]
   const radians = (rotation * Math.PI) / 180
   return points.map((point) => ({
