@@ -205,11 +205,20 @@ export function convertAltiumPcbDocToCircuitJson(
       continue
     }
 
-    if (record instanceof AltiumRegionRecord && isOverlayLayer(record.layer)) {
-      if (options.includeSilkscreen === false) continue
-      const graphic = convertSilkscreenRegion(record, index)
-      if (graphic) elements.push(graphic)
-      continue
+    if (record instanceof AltiumRegionRecord) {
+      if (record.regionKind === "POLYGON_CUTOUT") {
+        if (options.includeBoardOutline !== false) {
+          const cutout = convertRegionCutout(record, index)
+          if (cutout) elements.push(cutout)
+        }
+        continue
+      }
+      if (isOverlayLayer(record.layer)) {
+        if (options.includeSilkscreen === false) continue
+        const graphic = convertSilkscreenRegion(record, index)
+        if (graphic) elements.push(graphic)
+        continue
+      }
     }
 
     if (
@@ -226,6 +235,28 @@ export function convertAltiumPcbDocToCircuitJson(
   }
 
   return elements
+}
+
+function convertRegionCutout(
+  record: AltiumRegionRecord,
+  index: number,
+): PcbCutout | undefined {
+  if (record.recordKind !== "Region" || record.regionKind !== "POLYGON_CUTOUT") {
+    return undefined
+  }
+  
+  const geometry = getPcbRegionGeometry(record)
+  const points = geometry.outline.points.map(toMillimeterPoint)
+  
+  if (points.length < 3) return undefined
+
+  return {
+    type: "pcb_cutout",
+    pcb_cutout_id: `pcb_cutout_altium_region_${index}`,
+    pcb_board_id: BOARD_ID,
+    shape: "polygon",
+    points,
+  }
 }
 
 function convertCircularKeepout({
