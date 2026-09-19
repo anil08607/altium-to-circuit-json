@@ -241,13 +241,16 @@ function convertRegionCutout(
   record: AltiumRegionRecord,
   index: number,
 ): PcbCutout | undefined {
-  if (record.recordKind !== "Region" || record.regionKind !== "POLYGON_CUTOUT") {
+  if (
+    record.recordKind !== "Region" ||
+    record.regionKind !== "POLYGON_CUTOUT"
+  ) {
     return undefined
   }
-  
+
   const geometry = getPcbRegionGeometry(record)
   const points = geometry.outline.points.map(toMillimeterPoint)
-  
+
   if (points.length < 3) return undefined
 
   return {
