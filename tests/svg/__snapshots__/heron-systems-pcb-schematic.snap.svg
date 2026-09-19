@@ -1,7 +1,7 @@
 <svg width="1624" height="600" viewBox="0 0 1624 600" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-label="HERON systems PCB schematic: altiumts source on left, Circuit JSON on right" role="img">
   <g transform="translate(0, 37.0716510903427) scale(0.4984423676012461, 0.49844236760124605) translate(0, 0)">
     <title>altiumts source rendering</title>
-  <rect width="100%" height="100%" fill="#fffcf8"/>
+  <rect width="1605" height="1055" fill="#fffcf8" x="0" y="0"/>
   <g stroke-linecap="round" stroke-linejoin="round">
     <defs><clipPath id="altium-sheet-paper"><rect x="52.5" y="52.5" width="1500" height="950"/></clipPath></defs>
     <g data-record="SheetBorder" fill="#fffef8" stroke="#334155" stroke-width="1"><rect x="52.5" y="52.5" width="1500" height="950"/><rect x="72.5" y="72.5" width="1460" height="910" fill="none"/><path d="M 315.8333 52.5 V 72.5 M 315.8333 982.5 V 1002.5"/><path d="M 559.1667 52.5 V 72.5 M 559.1667 982.5 V 1002.5"/><path d="M 802.5 52.5 V 72.5 M 802.5 982.5 V 1002.5"/><path d="M 1045.8333 52.5 V 72.5 M 1045.8333 982.5 V 1002.5"/><path d="M 1289.1667 52.5 V 72.5 M 1289.1667 982.5 V 1002.5"/><path d="M 52.5 300 H 72.5 M 1532.5 300 H 1552.5"/><path d="M 52.5 527.5 H 72.5 M 1532.5 527.5 H 1552.5"/><path d="M 52.5 755 H 72.5 M 1532.5 755 H 1552.5"/></g>
@@ -709,7 +709,7 @@
     </g>
   </g>
   </g>
-  <g transform="translate(824, 0)">
+  <g transform="translate(824, 0) scale(1, 1) translate(0, 0)">
     <style>
               .boundary { fill: rgb(245, 241, 237); }
               .schematic-boundary { fill: none; stroke: #fff; }

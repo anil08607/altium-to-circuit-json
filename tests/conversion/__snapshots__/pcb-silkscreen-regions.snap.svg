@@ -1,13 +1,13 @@
 <svg width="1624" height="600" viewBox="0 0 1624 600" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-label="Filled PCB silkscreen region: altiumts source on left, Circuit JSON on right" role="img">
-  <g transform="translate(0, 6.800000000000011) scale(1.0680907877169559, 1.0681238615664845) translate(0, 0)">
+  <g transform="translate(0, 6.809078771695624) scale(1.0680907877169559, 1.0680907877169559) translate(0, 0)">
     <title>Altium PCB</title>
-  <rect width="100%" height="100%" fill="#071a16"/>
+  <rect width="749" height="549" fill="#071a16" x="0" y="0"/>
   <g stroke-linecap="round" stroke-linejoin="round">
     <polygon data-record="BoardOutline" points="24.5,524.5 724.5,524.5 724.5,24.5 24.5,24.5 24.5,524.5" fill="#123d32" stroke="#6ee7b7" stroke-width="3"/>
     <path data-record="Region" data-layer="TOPOVERLAY" d="M 99.5 449.5 L 649.5 449.5 L 649.5 99.5 L 99.5 99.5 L 99.5 449.5 Z M 299.5 349.5 L 449.5 349.5 L 449.5 199.5 L 299.5 199.5 Z" fill="#f8fafc" fill-opacity="0.32" fill-rule="evenodd" stroke="#f8fafc" stroke-width="1.5"/>
   </g>
   </g>
-  <g transform="translate(824, 0)">
+  <g transform="translate(824, 0) scale(1, 1) translate(0, 0)">
     <style></style><rect class="boundary" x="0" y="0" fill="#000" width="800" height="600" data-type="pcb_background" data-pcb-layer="global"/><rect class="pcb-boundary" fill="none" stroke="#fff" stroke-width="0.3" x="40.444893832153696" y="43.17492416582411" width="719.1102123356927" height="513.6501516683519" data-type="pcb_boundary" data-pcb-layer="global"/><path class="pcb-board" d="M 40.444893832153696 556.825075834176 L 759.5551061678464 556.825075834176 L 759.5551061678464 43.17492416582411 L 40.444893832153696 43.17492416582411 L 40.444893832153696 556.825075834176 Z" fill="none" stroke="rgba(255, 255, 255, 0.5)" stroke-width="4.04448938321537" data-type="pcb_board" data-pcb-layer="board"/><path class="pcb-silkscreen pcb-silkscreen-top" d="M 117.49241658240649 479.7775530839232 L 682.5075834175937 479.7775530839232 L 682.5075834175937 120.22244691607688 L 117.49241658240649 120.22244691607688 L 117.49241658240649 479.7775530839232 L 117.49241658240649 479.7775530839232 Z M 322.95247724974723 377.0475227502528 L 477.0475227502528 377.0475227502528 L 477.0475227502528 222.9524772497473 L 322.95247724974723 222.9524772497473 L 322.95247724974723 377.0475227502528 Z" fill="#f2eda1" fill-rule="evenodd" stroke="none" data-pcb-component-id="pcb_component_altium_board_graphics__stack1" data-pcb-silkscreen-graphic-id="pcb_silkscreen_graphic_altium_region_1__stack1" data-type="pcb_silkscreen_graphic" data-pcb-layer="top"/>
   </g>
 </svg>
