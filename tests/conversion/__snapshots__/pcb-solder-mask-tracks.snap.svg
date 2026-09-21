@@ -1,0 +1,14 @@
+<svg width="1624" height="800" viewBox="0 0 1624 800" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-label="Solder-mask tracks: altiumts source on left, Circuit JSON on right" role="img">
+  <g transform="translate(0, 0) scale(1.4953271028037383, 1.4953271028037383) translate(0, 0)">
+    <title>Altium PCB</title>
+  <rect width="535" height="535" fill="#071a16" x="0" y="0"/>
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <polygon data-record="BoardOutline" points="17.5,517.5 517.5,517.5 517.5,17.5 17.5,17.5 17.5,517.5" fill="#123d32" stroke="#6ee7b7" stroke-width="3"/>
+    <line data-record="Track" data-layer="BOTTOMSOLDER" x1="117.5" y1="167.5" x2="417.5" y2="167.5" stroke="#22c55e" stroke-width="30"/>
+    <line data-record="Track" data-layer="TOPSOLDER" x1="117.5" y1="367.5" x2="417.5" y2="367.5" stroke="#4ade80" stroke-width="20"/>
+  </g>
+  </g>
+  <g transform="translate(824, 100) scale(1, 1) translate(0, 0)">
+    <style></style><rect class="boundary" x="0" y="0" fill="#000" width="800" height="600" data-type="pcb_background" data-pcb-layer="global"/><rect class="pcb-boundary" fill="none" stroke="#fff" stroke-width="0.3" x="140.81632653061223" y="40.81632653061229" width="518.3673469387754" height="518.3673469387754" data-type="pcb_boundary" data-pcb-layer="global"/><path class="pcb-board" d="M 140.81632653061223 559.1836734693877 L 659.1836734693877 559.1836734693877 L 659.1836734693877 40.81632653061229 L 140.81632653061223 40.81632653061229 L 140.81632653061223 559.1836734693877 Z" fill="none" stroke="rgba(255, 255, 255, 0.5)" stroke-width="4.081632653061225" data-type="pcb_board" data-pcb-layer="board"/><path class="pcb-fabrication-note-path" stroke="#ec4899" fill="none" d="M 244.48979591836735 403.67346938775506 L 555.5102040816327 403.67346938775506" stroke-width="20.73469387755102" data-pcb-component-id="pcb_component_altium_board_graphics__stack1" data-pcb-fabrication-note-path-id="pcb_fabrication_note_path_altium_1__stack1" data-type="pcb_fabrication_note_path" data-pcb-layer="overlay"/><path class="pcb-fabrication-note-path" stroke="#ec4899" fill="none" d="M 244.48979591836735 196.32653061224494 L 555.5102040816327 196.32653061224494" stroke-width="31.10204081632653" data-pcb-component-id="pcb_component_altium_board_graphics__stack1" data-pcb-fabrication-note-path-id="pcb_fabrication_note_path_altium_2__stack1" data-type="pcb_fabrication_note_path" data-pcb-layer="overlay"/>
+  </g>
+</svg>

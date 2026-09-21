@@ -182,7 +182,10 @@ export function convertAltiumPcbDocToCircuitJson(
 
     if (record instanceof AltiumTrackRecord) {
       if (isCourtyardLayer(record.layer)) continue
-      if (isOverlayLayer(record.layer)) {
+      if (isSolderMaskLayer(record.layer)) {
+        const path = convertFabricationNotePath(record, index)
+        if (path) elements.push(path)
+      } else if (isOverlayLayer(record.layer)) {
         if (options.includeSilkscreen === false) continue
         const line = convertSilkscreenLine(record, index)
         if (line) elements.push(line)
@@ -289,7 +292,7 @@ function convertFabricationNotePath(
     type: "pcb_fabrication_note_path",
     pcb_fabrication_note_path_id: `pcb_fabrication_note_path_altium_${index}`,
     pcb_component_id: pcbComponentIdForRecord(record),
-    layer: mapCourtyardLayer(getLayer(record)),
+    layer: mapMechanicalLayer(getLayer(record)),
     route: route.map(toMillimeterPoint),
     stroke_width: milsToMillimeters(record.widthMils ?? 4),
     color: "#ec4899",
@@ -1146,6 +1149,11 @@ function mapTextAnchor(justification: string | undefined): NinePointAnchor {
 function isOverlayLayer(layer: string | undefined): boolean {
   const normalized = normalizeLayer(layer)
   return normalized === "TOPOVERLAY" || normalized === "BOTTOMOVERLAY"
+}
+
+function isSolderMaskLayer(layer: string | undefined): boolean {
+  const normalized = normalizeLayer(layer)
+  return normalized === "TOPSOLDER" || normalized === "BOTTOMSOLDER"
 }
 
 function isKeepoutLayer(layer: string | undefined): boolean {
