@@ -9,6 +9,7 @@ test(
       await createOpenSourcePcbComparison({
         filename: "nodemcu-esp12.PcbDoc",
         pcbName: "NodeMCU ESP-12",
+        showSolderMask: true,
       })
 
     expectValidImportedPcb({ circuitJson, circuitJsonSvg })

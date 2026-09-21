@@ -11,6 +11,7 @@ test(
         filename: TI_POWER_REFERENCE_PCB_FILENAMES.pmp23595,
         focusOnBoard: true,
         pcbName: "TI PMP23595",
+        showSolderMask: true,
       })
 
     expectValidImportedPcb({ circuitJson, circuitJsonSvg })

@@ -21,10 +21,12 @@ export async function createOpenSourcePcbComparison({
   filename,
   focusOnBoard = false,
   pcbName,
+  showSolderMask = false,
 }: {
   filename: string
   focusOnBoard?: boolean
   pcbName: string
+  showSolderMask?: boolean
 }): Promise<OpenSourcePcbComparison> {
   const source = await readReferenceBytes(filename)
   const document = parseAltiumFile(source).document
@@ -36,7 +38,10 @@ export async function createOpenSourcePcbComparison({
       `Expected ${filename} to contain an Altium PCB document, got ${document.type}`,
     )
   }
-  const circuitJson = convertAltiumToCircuitJson(source, { sourceType: "pcb" })
+  const circuitJson = convertAltiumToCircuitJson(source, {
+    pcb: { includeSolderMask: showSolderMask },
+    sourceType: "pcb",
+  })
   const board = circuitJson.find((element) => element.type === "pcb_board")
   if (!board) throw new Error(`${filename} did not produce a PCB board`)
 
@@ -68,6 +73,7 @@ export async function createOpenSourcePcbComparison({
   })
   const circuitJsonSvg = convertCircuitJsonToPcbSvg(circuitJson, {
     matchBoardAspectRatio: true,
+    showSolderMask,
     viewportTarget: focusOnBoard
       ? { pcb_board_id: board.pcb_board_id }
       : undefined,

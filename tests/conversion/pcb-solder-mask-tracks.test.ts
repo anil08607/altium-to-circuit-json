@@ -61,9 +61,14 @@ test("renders top and bottom solder-mask tracks with solder-mask color", async (
     },
   ])
 
+  const circuitJsonSvg = convertCircuitJsonToPcbSvg(circuitJson, {
+    showSolderMask: true,
+  })
+  expect(circuitJsonSvg).toContain('class="pcb-board-soldermask"')
+
   const comparisonSvg = stackAltiumAndCircuitJsonSvgs({
     altiumSvg: serializeAltiumPcbToSvg(solderMaskTrackPcbDoc),
-    circuitJsonSvg: convertCircuitJsonToPcbSvg(circuitJson),
+    circuitJsonSvg,
     label: "Solder-mask tracks",
   })
   await expect(comparisonSvg).toMatchSvgSnapshot(import.meta.path)
