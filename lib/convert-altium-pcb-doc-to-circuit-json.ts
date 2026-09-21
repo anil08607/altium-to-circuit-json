@@ -54,6 +54,7 @@ const MILS_TO_MILLIMETERS = 0.0254
 const ALTIUM_SLOT_HOLE_TYPE = 2
 const BOARD_ID = "pcb_board_altium"
 const BOARD_GRAPHICS_COMPONENT_ID = "pcb_component_altium_board_graphics"
+const SOLDER_MASK_TRACK_COLOR = "rgb(52, 135, 73)"
 const ALTIUM_TEXT_ANCHORS: readonly NinePointAnchor[] = [
   "top_left",
   "center_left",
@@ -185,7 +186,11 @@ export function convertAltiumPcbDocToCircuitJson(
       if (isCourtyardLayer(record.layer)) continue
       if (isSolderMaskLayer(record.layer)) {
         if (options.includeSolderMask !== true) continue
-        const path = convertFabricationNotePath(record, index)
+        const path = convertFabricationNotePath(
+          record,
+          index,
+          SOLDER_MASK_TRACK_COLOR,
+        )
         if (path) elements.push(path)
       } else if (isOverlayLayer(record.layer)) {
         if (options.includeSilkscreen === false) continue
@@ -275,6 +280,7 @@ function isExplodedDimensionGraphic(
 function convertFabricationNotePath(
   record: AltiumTrackRecord | AltiumArcRecord,
   index: number,
+  color = "#ec4899",
 ): PcbFabricationNotePath | undefined {
   let route: AltiumPoint[]
   if (record instanceof AltiumTrackRecord) {
@@ -297,7 +303,7 @@ function convertFabricationNotePath(
     layer: mapMechanicalLayer(getLayer(record)),
     route: route.map(toMillimeterPoint),
     stroke_width: milsToMillimeters(record.widthMils ?? 4),
-    color: "#ec4899",
+    color,
   }
 }
 

@@ -13,7 +13,7 @@ const solderMaskTrackPcbDoc = parseAltiumPcbDoc(
   ].join("\n"),
 )
 
-test("preserves top and bottom solder-mask tracks as fabrication paths", async () => {
+test("renders top and bottom solder-mask tracks with solder-mask color", async () => {
   expect(
     convertAltiumPcbDocToCircuitJson(solderMaskTrackPcbDoc).some(
       (element) => element.type === "pcb_fabrication_note_path",
@@ -29,16 +29,20 @@ test("preserves top and bottom solder-mask tracks as fabrication paths", async (
   )
 
   expect(paths).toHaveLength(2)
-  const normalizedPaths = paths.map(({ layer, route, stroke_width }) => ({
-    layer,
-    route: route.map(({ x, y }) => ({
-      x: Number(x.toFixed(3)),
-      y: Number(y.toFixed(3)),
-    })),
-    stroke_width,
-  }))
+  const normalizedPaths = paths.map(
+    ({ color, layer, route, stroke_width }) => ({
+      color,
+      layer,
+      route: route.map(({ x, y }) => ({
+        x: Number(x.toFixed(3)),
+        y: Number(y.toFixed(3)),
+      })),
+      stroke_width,
+    }),
+  )
   expect(normalizedPaths).toEqual([
     {
+      color: "rgb(52, 135, 73)",
       layer: "top",
       route: [
         { x: 2.54, y: 3.81 },
@@ -47,6 +51,7 @@ test("preserves top and bottom solder-mask tracks as fabrication paths", async (
       stroke_width: 0.508,
     },
     {
+      color: "rgb(52, 135, 73)",
       layer: "bottom",
       route: [
         { x: 2.54, y: 8.89 },
