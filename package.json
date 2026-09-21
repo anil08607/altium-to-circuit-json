@@ -44,7 +44,7 @@
   },
   "dependencies": {
     "altiumts": "^0.0.74",
-    "circuit-json": "^0.0.475",
+    "circuit-json": "github:anil08607/circuit-json#6cab65770e02ac343e249117f3b584ffbaa1a4d5",
     "format-si-unit": "^0.0.11",
     "schematic-symbols": "^0.0.238"
   },
@@ -59,7 +59,7 @@
     "fflate": "^0.8.3",
     "bun-match-svg": "^0.0.15",
     "circuit-json-to-connectivity-map": "^0.0.25",
-    "circuit-to-svg": "^0.0.394",
+    "circuit-to-svg": "github:anil08607/circuit-to-svg#d7dc969e89e728ccd911a4ed6d0883adb0242a0b",
     "sharp": "^0.35.3",
     "stack-svgs": "^0.0.1",
     "tsup": "^8.5.1",

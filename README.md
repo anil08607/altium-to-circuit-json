@@ -46,6 +46,7 @@ PCB conversion currently emits:
 - polygon board outlines and board cutouts;
 - PCB component placement bounds;
 - top, bottom, and inner-layer copper tracks;
+- standalone top and bottom solder-mask tracks as `pcb_soldermask_opening` elements;
 - vias;
 - circular, rectangular, rounded, octagonal, rotated, pill, slotted, plated, and non-plated pads/holes;
 - top and bottom silkscreen lines, arcs, fills, and text; and
@@ -77,6 +78,22 @@ as an opt-in compatibility overlay with `includeSheetBorder: true`.
 The package is intentionally an incremental converter. Complete component
 classification, copper pours/regions, mechanical/dimension primitives, models,
 and project-level hierarchy remain follow-up areas.
+
+Tracks on Altium `TOPSOLDER` and `BOTTOMSOLDER` remove solder mask. They are
+imported by default as native mask openings, without adding copper or net
+connectivity. Coordinates and widths are converted from mils to millimeters;
+round end caps are approximated with at most 0.001 mm deviation. A zero-length
+track becomes a circular opening. To omit these elements, pass
+`{ pcb: { includeSolderMask: false } }` to `convertAltiumToCircuitJson`, or
+`{ includeSolderMask: false }` to the PCB converter. This option is independent
+of `includeTraces` and `includeSilkscreen`.
+
+This branch uses commit-pinned previews of the native solder-mask schema and
+SVG renderer. The schema follows [circuit-json#739](https://github.com/tscircuit/circuit-json/pull/739).
+These dependencies must be released before publishing this converter to npm.
+Downstream viewers need support for `pcb_soldermask_opening` to display these
+elements. SVG comparisons use the pinned renderer with `showSolderMask: true`
+to verify both board sides.
 
 ## Visual tests
 

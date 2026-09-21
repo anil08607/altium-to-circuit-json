@@ -48,6 +48,10 @@ import {
 } from "./pcb/get-altium-pad-geometry"
 import { getPreferredPcbBoardOutline } from "./pcb/get-board-outline"
 import { mapAltiumCopperLayer } from "./pcb/map-altium-copper-layer"
+import {
+  convertAltiumSoldermaskTrack,
+  mapAltiumSoldermaskLayer,
+} from "./pcb/convert-altium-soldermask-track"
 import { stitchConnectedAltiumPaths } from "./pcb/stitch-connected-paths"
 
 const MILS_TO_MILLIMETERS = 0.0254
@@ -75,6 +79,8 @@ export interface ConvertAltiumPcbDocOptions {
   includeDimensions?: boolean
   includePads?: boolean
   includeSilkscreen?: boolean
+  /** Import standalone TOPSOLDER/BOTTOMSOLDER track openings (default: true). */
+  includeSolderMask?: boolean
   includeTraces?: boolean
   includeVias?: boolean
 }
@@ -182,7 +188,11 @@ export function convertAltiumPcbDocToCircuitJson(
 
     if (record instanceof AltiumTrackRecord) {
       if (isCourtyardLayer(record.layer)) continue
-      if (isOverlayLayer(record.layer)) {
+      if (mapAltiumSoldermaskLayer(record.layer)) {
+        if (options.includeSolderMask === false) continue
+        const opening = convertAltiumSoldermaskTrack(record, index)
+        if (opening) elements.push(opening)
+      } else if (isOverlayLayer(record.layer)) {
         if (options.includeSilkscreen === false) continue
         const line = convertSilkscreenLine(record, index)
         if (line) elements.push(line)
@@ -775,7 +785,8 @@ function convertVia(
       record.holeSizeMils ?? (record.diameterMils ?? 20) * 0.45,
     ),
     layers,
-    is_tented: record.tentedTop === true && record.tentedBottom === true,
+    tented_on_top: record.tentedTop === true,
+    tented_on_bottom: record.tentedBottom === true,
   }
 }
 
