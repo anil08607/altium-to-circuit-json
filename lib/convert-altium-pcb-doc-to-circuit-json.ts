@@ -75,6 +75,7 @@ export interface ConvertAltiumPcbDocOptions {
   includeDimensions?: boolean
   includePads?: boolean
   includeSilkscreen?: boolean
+  includeSolderMask?: boolean
   includeTraces?: boolean
   includeVias?: boolean
 }
@@ -183,6 +184,7 @@ export function convertAltiumPcbDocToCircuitJson(
     if (record instanceof AltiumTrackRecord) {
       if (isCourtyardLayer(record.layer)) continue
       if (isSolderMaskLayer(record.layer)) {
+        if (options.includeSolderMask !== true) continue
         const path = convertFabricationNotePath(record, index)
         if (path) elements.push(path)
       } else if (isOverlayLayer(record.layer)) {

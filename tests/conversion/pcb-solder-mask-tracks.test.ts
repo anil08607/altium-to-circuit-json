@@ -14,7 +14,15 @@ const solderMaskTrackPcbDoc = parseAltiumPcbDoc(
 )
 
 test("preserves top and bottom solder-mask tracks as fabrication paths", async () => {
-  const circuitJson = convertAltiumPcbDocToCircuitJson(solderMaskTrackPcbDoc)
+  expect(
+    convertAltiumPcbDocToCircuitJson(solderMaskTrackPcbDoc).some(
+      (element) => element.type === "pcb_fabrication_note_path",
+    ),
+  ).toBe(false)
+
+  const circuitJson = convertAltiumPcbDocToCircuitJson(solderMaskTrackPcbDoc, {
+    includeSolderMask: true,
+  })
   const paths = circuitJson.filter(
     (element): element is PcbFabricationNotePath =>
       element.type === "pcb_fabrication_note_path",
