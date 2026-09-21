@@ -42,6 +42,10 @@ import type {
 } from "circuit-json"
 import { convertAltiumCopperAreas } from "./pcb/convert-altium-copper-areas"
 import {
+  convertAltiumPcbSoldermaskOpening,
+  isAltiumSoldermaskLayer,
+} from "./pcb/convert-altium-pcb-soldermask-opening"
+import {
   getAltiumPadGeometry,
   getAltiumPadHoleGeometry,
   getAltiumSlotHoleSize,
@@ -54,7 +58,6 @@ const MILS_TO_MILLIMETERS = 0.0254
 const ALTIUM_SLOT_HOLE_TYPE = 2
 const BOARD_ID = "pcb_board_altium"
 const BOARD_GRAPHICS_COMPONENT_ID = "pcb_component_altium_board_graphics"
-const SOLDER_MASK_TRACK_COLOR = "rgb(52, 135, 73)"
 const ALTIUM_TEXT_ANCHORS: readonly NinePointAnchor[] = [
   "top_left",
   "center_left",
@@ -144,6 +147,17 @@ export function convertAltiumPcbDocToCircuitJson(
   }
 
   for (const [index, record] of document.records.entries()) {
+    if (options.includeSolderMask === true) {
+      const soldermaskOpening = convertAltiumPcbSoldermaskOpening({
+        record,
+        recordIndex: index,
+      })
+      if (soldermaskOpening) {
+        elements.push(soldermaskOpening)
+        continue
+      }
+    }
+
     if (
       record instanceof AltiumArcRecord &&
       isKeepoutLayer(record.layer) &&
@@ -185,13 +199,7 @@ export function convertAltiumPcbDocToCircuitJson(
     if (record instanceof AltiumTrackRecord) {
       if (isCourtyardLayer(record.layer)) continue
       if (isSolderMaskLayer(record.layer)) {
-        if (options.includeSolderMask !== true) continue
-        const path = convertFabricationNotePath(
-          record,
-          index,
-          SOLDER_MASK_TRACK_COLOR,
-        )
-        if (path) elements.push(path)
+        continue
       } else if (isOverlayLayer(record.layer)) {
         if (options.includeSilkscreen === false) continue
         const line = convertSilkscreenLine(record, index)
@@ -280,7 +288,6 @@ function isExplodedDimensionGraphic(
 function convertFabricationNotePath(
   record: AltiumTrackRecord | AltiumArcRecord,
   index: number,
-  color = "#ec4899",
 ): PcbFabricationNotePath | undefined {
   let route: AltiumPoint[]
   if (record instanceof AltiumTrackRecord) {
@@ -303,7 +310,7 @@ function convertFabricationNotePath(
     layer: mapMechanicalLayer(getLayer(record)),
     route: route.map(toMillimeterPoint),
     stroke_width: milsToMillimeters(record.widthMils ?? 4),
-    color,
+    color: "#ec4899",
   }
 }
 
@@ -587,6 +594,11 @@ function createBoard(document: AltiumPcbDocument): PcbBoard {
     thickness: 1.6,
     num_layers: numLayers,
     material: "fr4",
+    ...(document.records.some((record) =>
+      isAltiumSoldermaskLayer(getLayer(record)),
+    )
+      ? { solder_mask_color: "green" }
+      : {}),
   }
 }
 

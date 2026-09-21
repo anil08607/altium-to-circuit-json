@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test"
 import { parseAltiumPcbDoc, serializeAltiumPcbToSvg } from "altiumts"
-import type { PcbFabricationNotePath } from "circuit-json"
+import type { PcbCopperPour } from "circuit-json"
 import { convertCircuitJsonToPcbSvg } from "circuit-to-svg"
 import { convertAltiumPcbDocToCircuitJson } from "../../lib"
 import { stackAltiumAndCircuitJsonSvgs } from "../helpers/stack-svg-comparison"
@@ -13,53 +13,68 @@ const solderMaskTrackPcbDoc = parseAltiumPcbDoc(
   ].join("\n"),
 )
 
-test("renders top and bottom solder-mask tracks with solder-mask color", async () => {
+test("imports top and bottom tracks as solder-mask openings", async () => {
   expect(
     convertAltiumPcbDocToCircuitJson(solderMaskTrackPcbDoc).some(
-      (element) => element.type === "pcb_fabrication_note_path",
+      (element) =>
+        element.type === "pcb_copper_pour" &&
+        element.pcb_copper_pour_id.includes("soldermask_opening"),
     ),
   ).toBe(false)
 
   const circuitJson = convertAltiumPcbDocToCircuitJson(solderMaskTrackPcbDoc, {
     includeSolderMask: true,
   })
-  const paths = circuitJson.filter(
-    (element): element is PcbFabricationNotePath =>
-      element.type === "pcb_fabrication_note_path",
+  const openings = circuitJson.filter(
+    (element): element is PcbCopperPour =>
+      element.type === "pcb_copper_pour" &&
+      element.pcb_copper_pour_id.includes("soldermask_opening"),
   )
 
-  expect(paths).toHaveLength(2)
-  const normalizedPaths = paths.map(
-    ({ color, layer, route, stroke_width }) => ({
-      color,
-      layer,
-      route: route.map(({ x, y }) => ({
-        x: Number(x.toFixed(3)),
-        y: Number(y.toFixed(3)),
-      })),
-      stroke_width,
-    }),
-  )
-  expect(normalizedPaths).toEqual([
+  expect(openings).toHaveLength(2)
+  const normalizedOpenings = openings.map((opening) => {
+    expect(opening.shape).toBe("polygon")
+    if (opening.shape !== "polygon") throw new Error("Expected polygon opening")
+    const xs = opening.points.map((point) => point.x)
+    const ys = opening.points.map((point) => point.y)
+    return {
+      center: {
+        x: Number(((Math.min(...xs) + Math.max(...xs)) / 2).toFixed(3)),
+        y: Number(((Math.min(...ys) + Math.max(...ys)) / 2).toFixed(3)),
+      },
+      covered_with_solder_mask: opening.covered_with_solder_mask,
+      height: Number((Math.max(...ys) - Math.min(...ys)).toFixed(3)),
+      layer: opening.layer,
+      point_count: opening.points.length,
+      shape: opening.shape,
+      width: Number((Math.max(...xs) - Math.min(...xs)).toFixed(3)),
+    }
+  })
+  expect(normalizedOpenings).toEqual([
     {
-      color: "rgb(52, 135, 73)",
+      center: { x: 6.35, y: 3.81 },
+      covered_with_solder_mask: false,
+      height: 0.508,
       layer: "top",
-      route: [
-        { x: 2.54, y: 3.81 },
-        { x: 10.16, y: 3.81 },
-      ],
-      stroke_width: 0.508,
+      point_count: 18,
+      shape: "polygon",
+      width: 8.128,
     },
     {
-      color: "rgb(52, 135, 73)",
+      center: { x: 6.35, y: 8.89 },
+      covered_with_solder_mask: false,
+      height: 0.762,
       layer: "bottom",
-      route: [
-        { x: 2.54, y: 8.89 },
-        { x: 10.16, y: 8.89 },
-      ],
-      stroke_width: 0.762,
+      point_count: 18,
+      shape: "polygon",
+      width: 8.382,
     },
   ])
+
+  expect(
+    circuitJson.find((element) => element.type === "pcb_board")
+      ?.solder_mask_color,
+  ).toBe("green")
 
   const circuitJsonSvg = convertCircuitJsonToPcbSvg(circuitJson, {
     showSolderMask: true,
