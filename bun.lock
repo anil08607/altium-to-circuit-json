@@ -6,7 +6,7 @@
       "name": "altium-to-circuit-json",
       "dependencies": {
         "altiumts": "^0.0.74",
-        "circuit-json": "github:anil08607/circuit-json#6cab65770e02ac343e249117f3b584ffbaa1a4d5",
+        "circuit-json": "github:anil08607/circuit-json#db62e2e174bcfe7cd10ac5781042e471b6b2c6e5",
         "format-si-unit": "^0.0.11",
         "schematic-symbols": "^0.0.238",
       },
@@ -20,7 +20,7 @@
         "@vitejs/plugin-react": "^6.0.1",
         "bun-match-svg": "^0.0.15",
         "circuit-json-to-connectivity-map": "^0.0.25",
-        "circuit-to-svg": "github:anil08607/circuit-to-svg#d7dc969e89e728ccd911a4ed6d0883adb0242a0b",
+        "circuit-to-svg": "github:anil08607/circuit-to-svg#1d8e66eca7be149e2cd8daa5409ca0b4f165c3d7",
         "fflate": "^0.8.3",
         "react": "^19.2.0",
         "react-dom": "^19.2.5",
@@ -501,11 +501,11 @@
 
     "chownr": ["chownr@3.0.0", "", {}, "sha512-+IxzY9BZOQd/XuYPRmrvEVjF/nqj5kgT4kEq7VofrDoM1MxoRjEWkrCC3EtLi59TVawxTAn+orJwFQcrqEN1+g=="],
 
-    "circuit-json": ["circuit-json@github:anil08607/circuit-json#6cab657", { "peerDependencies": { "format-si-unit": "*" } }, "anil08607-circuit-json-6cab657", "sha512-0zClzEZ01kQVWhDfcOt2D4hqO9LIEFpY60K7GyolNWBxrIhX8RSR7oYiv7RStk+/mPR2jqCpPJJsSL5h5gkcyg=="],
+    "circuit-json": ["circuit-json@github:anil08607/circuit-json#db62e2e", { "peerDependencies": { "format-si-unit": "*" } }, "anil08607-circuit-json-db62e2e", "sha512-eVaMhXLdN1QYwcfyTbPRpA/ALUtkSM+DXp+Mwsw8AQVEJy3fIHakimAZ12yI5d5FkBG0LeM7txmxgMG/dlc5Uw=="],
 
     "circuit-json-to-connectivity-map": ["circuit-json-to-connectivity-map@0.0.25", "", { "dependencies": { "@tscircuit/math-utils": "^0.0.9" }, "peerDependencies": { "typescript": "^5.9.3" } }, "sha512-6UhBtJX83HcGGzRr7DvyiidTYLXQCPEiftoyqH/YX4ZSuTyg/jP9DOpScMgi0Dq/SdYp6G1MzmOQNwvppw99eA=="],
 
-    "circuit-to-svg": ["circuit-to-svg@github:anil08607/circuit-to-svg#d7dc969", { "dependencies": { "@types/node": "^22.5.5", "bun-types": "^1.1.40", "calculate-elbow": "0.0.12", "debug": "^4.4.3", "svg-path-commander": "^2.1.11", "svgson": "^5.3.1", "transformation-matrix": "^2.16.1" }, "peerDependencies": { "@tscircuit/alphabet": "*" } }, "anil08607-circuit-to-svg-d7dc969", "sha512-0llKZDan88xbqufk0xtaMN+yEVBQH40jC8MRnu/X46CxEOhvcnfTmV16/BP5EQcEoNxp/0Uz5cGD47FuJTJ+xw=="],
+    "circuit-to-svg": ["circuit-to-svg@github:anil08607/circuit-to-svg#1d8e66e", { "dependencies": { "@types/node": "^22.5.5", "bun-types": "^1.1.40", "calculate-elbow": "0.0.12", "debug": "^4.4.3", "svg-path-commander": "^2.1.11", "svgson": "^5.3.1", "transformation-matrix": "^2.16.1" }, "peerDependencies": { "@tscircuit/alphabet": "*" } }, "anil08607-circuit-to-svg-1d8e66e", "sha512-GBnCeAvK2mOggrBsy4khIzWJAAnw5IMsJ//dJaxmuuTXNBoLBkWp9sfpOO8xZue/uFpT3g2SByWoiXr+2YhIAg=="],
 
     "cjs-module-lexer": ["cjs-module-lexer@1.2.3", "", {}, "sha512-0TNiGstbQmCFwt4akjjBg5pLRTSyj/PkWQ1ZoO2zntmg9yLqSRxwEa4iCfQLGjqhiqBfOJa7W/E8wfGrTDmlZQ=="],
 

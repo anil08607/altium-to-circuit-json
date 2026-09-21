@@ -89,7 +89,7 @@ track becomes a circular opening. To omit these elements, pass
 of `includeTraces` and `includeSilkscreen`.
 
 This branch uses commit-pinned previews of the native solder-mask schema and
-SVG renderer. The schema follows [circuit-json#739](https://github.com/tscircuit/circuit-json/pull/739).
+SVG renderer. The standalone schema is defined in [circuit-json#809](https://github.com/tscircuit/circuit-json/pull/809).
 These dependencies must be released before publishing this converter to npm.
 Downstream viewers need support for `pcb_soldermask_opening` to display these
 elements. SVG comparisons use the pinned renderer with `showSolderMask: true`
