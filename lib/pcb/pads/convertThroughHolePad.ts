@@ -7,35 +7,26 @@ import { isRectangularShape } from "./isRectangularShape"
 import { isSlottedThroughHolePad } from "./isSlottedThroughHolePad"
 import type { ThroughHolePadConversionOptions } from "./types"
 
-export function convertThroughHolePad({
-  cornerRadius,
-  geometry,
-  height,
-  holeDiameter,
-  id,
-  record,
-  shape,
-  width,
-  x,
-  y,
-}: ThroughHolePadConversionOptions): PcbPlatedHole {
+export function convertThroughHolePad(
+  options: ThroughHolePadConversionOptions,
+): PcbPlatedHole {
+  if (isSlottedThroughHolePad(options)) {
+    return convertSlottedThroughHolePad(options)
+  }
+
+  const {
+    cornerRadius,
+    geometry,
+    height,
+    holeDiameter,
+    id,
+    shape,
+    width,
+    x,
+    y,
+  } = options
   const holeOffset = getRotatedHoleOffset(geometry)
   const layers: LayerRef[] = ["top", "bottom"]
-
-  if (isSlottedThroughHolePad({ geometry, record })) {
-    return convertSlottedThroughHolePad({
-      cornerRadius,
-      geometry,
-      height,
-      holeDiameter,
-      id,
-      record,
-      shape,
-      width,
-      x,
-      y,
-    })
-  }
 
   if (isRectangularShape(shape)) {
     return {

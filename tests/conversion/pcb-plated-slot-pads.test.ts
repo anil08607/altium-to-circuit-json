@@ -1,6 +1,16 @@
 import { expect, test } from "bun:test"
-import { parseAltiumPcbDoc } from "altiumts"
+import {
+  AltiumPadRecord,
+  getAltiumPcbPadGeometry,
+  parseAltiumPcbDoc,
+} from "altiumts"
 import { convertAltiumPcbDocToCircuitJson } from "../../lib"
+import { milsToMillimeters } from "../../lib/pcb/geometry"
+import {
+  convertSlottedThroughHolePad,
+  convertThroughHolePad,
+  normalizeShape,
+} from "../../lib/pcb/pads"
 
 const platedSlotPcbDoc = parseAltiumPcbDoc(
   [
@@ -49,4 +59,42 @@ test("preserves plated slot, hole offset, and pad geometry", () => {
       corner_radius: 0.127,
     }),
   )
+})
+
+test("calculates a slotted pad's hole offset only in the slot converter", () => {
+  const record = platedSlotPcbDoc.records.find(
+    (record): record is AltiumPadRecord => record instanceof AltiumPadRecord,
+  )
+  if (!record?.position) throw new Error("Expected a positioned pad")
+  const geometry = getAltiumPcbPadGeometry({
+    record,
+    useRequestedLayerGeometry: true,
+  })
+  const options = {
+    cornerRadius: milsToMillimeters(geometry.cornerRadiusMils),
+    geometry,
+    height: milsToMillimeters(geometry.heightMils),
+    holeDiameter: milsToMillimeters(geometry.holeSizeMils),
+    id: "slot_regression",
+    record,
+    shape: normalizeShape(geometry.shape),
+    width: milsToMillimeters(geometry.widthMils),
+    x: milsToMillimeters(record.position.x),
+    y: milsToMillimeters(record.position.y),
+  }
+  const expected = convertSlottedThroughHolePad(options)
+  let offsetReads = 0
+  const actual = convertThroughHolePad({
+    ...options,
+    geometry: {
+      ...geometry,
+      get holeOffsetXMils() {
+        offsetReads++
+        return geometry.holeOffsetXMils
+      },
+    },
+  })
+
+  expect(actual).toEqual(expected)
+  expect(offsetReads).toBe(1)
 })
