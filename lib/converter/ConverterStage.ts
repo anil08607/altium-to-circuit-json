@@ -13,6 +13,7 @@ export abstract class ConverterStage<Input, Output> {
   }
 
   step(): void {
+    if (this.finished) return
     this.iteration++
     if (this.iteration > this.maxIterations) {
       throw new Error(
