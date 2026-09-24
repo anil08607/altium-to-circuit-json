@@ -3,6 +3,7 @@ import type { PcbCopperText } from "circuit-json"
 import { milsToMillimeters, toMillimeterPoint } from "../geometry"
 import { getPcbComponentIdForRecord } from "../identifiers"
 import { mapAltiumCopperLayer } from "../layers"
+import { getPcbTextKnockout } from "./getPcbTextKnockout"
 import { mapTextAnchor } from "./mapTextAnchor"
 
 export function convertPcbCopperText({
@@ -27,5 +28,6 @@ export function convertPcbCopperText({
     ccw_rotation: record.rotation,
     layer,
     is_mirrored: record.mirrored,
+    ...getPcbTextKnockout(record),
   }
 }

@@ -3,7 +3,7 @@ import type { PcbSilkscreenText } from "circuit-json"
 import { milsToMillimeters, toMillimeterPoint } from "../geometry"
 import { getPcbComponentIdForRecord } from "../identifiers"
 import { mapOverlayLayer } from "../layers"
-import { mapTextAnchor } from "../text"
+import { getPcbTextKnockout, mapTextAnchor } from "../text"
 
 export function convertPcbSilkscreenText({
   record,
@@ -25,5 +25,6 @@ export function convertPcbSilkscreenText({
     ccw_rotation: record.rotation,
     layer: mapOverlayLayer(record.layer),
     is_mirrored: record.mirrored,
+    ...getPcbTextKnockout(record),
   }
 }

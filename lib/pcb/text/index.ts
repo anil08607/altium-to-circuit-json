@@ -1,5 +1,6 @@
 export * from "./constants"
 export * from "./convertPcbCopperText"
 export * from "./convertPcbMechanicalText"
+export * from "./getPcbTextKnockout"
 export * from "./mapFabricationTextAnchor"
 export * from "./mapTextAnchor"
