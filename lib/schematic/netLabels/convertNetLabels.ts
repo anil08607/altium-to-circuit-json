@@ -1,7 +1,6 @@
 import {
   type AltiumRecord,
   type AltiumSchDoc,
-  AltiumSchLabelRecord,
   AltiumSchNetLabelRecord,
   AltiumSchPortRecord,
   AltiumSchPowerPortRecord,
@@ -58,9 +57,6 @@ export function convertNetLabels({
     if (!name || !location) continue
     const connectedWires = graph.getConnectedWiresForRecord(record)
     const wire = connectedWires[0]
-    // Altium's generic label record is also used for page titles and notes.
-    // It is only an electrical net label when it touches a wire.
-    if (record instanceof AltiumSchLabelRecord && !wire) continue
     const sourceTraceId = connectivity.sourceTraceIdByRecord.get(record)
     const shouldRenderInline =
       Boolean(sourceTraceId) &&

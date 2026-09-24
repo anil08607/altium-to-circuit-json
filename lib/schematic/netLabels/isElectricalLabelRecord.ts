@@ -1,6 +1,5 @@
 import {
   type AltiumRecord,
-  AltiumSchLabelRecord,
   AltiumSchNetLabelRecord,
   AltiumSchPortRecord,
   AltiumSchPowerPortRecord,
@@ -11,7 +10,6 @@ export function isElectricalLabelRecord(
   record: AltiumRecord,
 ): record is ElectricalLabelRecord {
   return (
-    record instanceof AltiumSchLabelRecord ||
     record instanceof AltiumSchNetLabelRecord ||
     record instanceof AltiumSchPortRecord ||
     record instanceof AltiumSchPowerPortRecord

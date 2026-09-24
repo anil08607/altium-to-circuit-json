@@ -1,13 +1,11 @@
 import {
   type AltiumSchDoc,
   AltiumSchJunctionRecord,
-  AltiumSchLabelRecord,
-  AltiumSchNetLabelRecord,
   AltiumSchPortRecord,
-  AltiumSchPowerPortRecord,
 } from "altiumts"
 import { getLocation } from "../geometry"
 import type { SchematicSegment } from "../model"
+import { isElectricalLabelRecord } from "../netLabels/isElectricalLabelRecord"
 import { getPortConnectionGeometry } from "./getPortConnectionGeometry"
 import type { PositionedElectricalRecord } from "./types"
 
@@ -17,10 +15,7 @@ export function getPositionedElectricalRecords(
 ): PositionedElectricalRecord[] {
   return document.records.flatMap((record) => {
     if (
-      !(record instanceof AltiumSchLabelRecord) &&
-      !(record instanceof AltiumSchNetLabelRecord) &&
-      !(record instanceof AltiumSchPortRecord) &&
-      !(record instanceof AltiumSchPowerPortRecord) &&
+      !isElectricalLabelRecord(record) &&
       !(record instanceof AltiumSchJunctionRecord)
     ) {
       return []

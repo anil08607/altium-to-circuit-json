@@ -12,6 +12,17 @@ test(
       })
 
     expectValidImportedSchematic({ circuitJson, circuitJsonSvg })
+    expect(
+      circuitJson.filter(
+        (element) =>
+          element.type === "schematic_text" && element.text === "RESV",
+      ),
+    ).toHaveLength(5)
+    expect(
+      circuitJson.filter(
+        (element) => element.type === "source_net" && element.name === "RESV",
+      ),
+    ).toEqual([])
     await expect(comparisonSvg).toMatchSvgSnapshot(import.meta.path)
   },
   { timeout: 40_000 },

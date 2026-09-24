@@ -1,14 +1,12 @@
 import {
-  AltiumSchLabelRecord,
-  AltiumSchNetLabelRecord,
   AltiumSchPortRecord,
-  AltiumSchPowerPortRecord,
   type AltiumSchWireRecord,
   getSchematicRecordPoints,
 } from "altiumts"
 import { getLocation, pointKey, type SchematicPointKey } from "../geometry"
 import { type SchematicSegmentKey, segmentKey } from "../identifiers"
 import type { ConvertedPort, SemanticNet } from "../model"
+import { isElectricalLabelRecord } from "../netLabels/isElectricalLabelRecord"
 import { addIncidentSegment } from "./addIncidentSegment"
 import { getPortConnectionGeometry } from "./getPortConnectionGeometry"
 import { getWireSegments } from "./getWireSegments"
@@ -36,14 +34,7 @@ export function getEquivalentPortPrunedSegmentKeys({
       .map((port) => pointKey(port.point)),
   )
   for (const record of net.records) {
-    if (
-      !(record instanceof AltiumSchLabelRecord) &&
-      !(record instanceof AltiumSchNetLabelRecord) &&
-      !(record instanceof AltiumSchPortRecord) &&
-      !(record instanceof AltiumSchPowerPortRecord)
-    ) {
-      continue
-    }
+    if (!isElectricalLabelRecord(record)) continue
     const location =
       record instanceof AltiumSchPortRecord
         ? getPortConnectionGeometry(record, wireSegments)?.anchor

@@ -1,17 +1,11 @@
-import {
-  type AltiumRecord,
-  AltiumSchLabelRecord,
-  AltiumSchNetLabelRecord,
-  AltiumSchPortRecord,
-  AltiumSchPowerPortRecord,
-} from "altiumts"
+import type { AltiumRecord } from "altiumts"
+import { getElectricalLabelName } from "../netLabels/getElectricalLabelName"
+import { isElectricalLabelRecord } from "../netLabels/isElectricalLabelRecord"
 
 export function getElectricalRecordName(
   record: AltiumRecord,
 ): string | undefined {
-  if (record instanceof AltiumSchPortRecord) return record.name
-  if (record instanceof AltiumSchLabelRecord) return record.text
-  if (record instanceof AltiumSchNetLabelRecord) return record.text
-  if (record instanceof AltiumSchPowerPortRecord) return record.text
-  return undefined
+  return isElectricalLabelRecord(record)
+    ? getElectricalLabelName(record)
+    : undefined
 }
