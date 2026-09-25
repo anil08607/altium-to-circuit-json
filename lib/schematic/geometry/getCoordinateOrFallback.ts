@@ -9,5 +9,5 @@ export function getCoordinateOrFallback({
   key: string
   fallback: number
 }): number {
-  return getSchematicCoordinate(record, key, fallback)
+  return getSchematicCoordinate(record, { key, fallback })
 }
