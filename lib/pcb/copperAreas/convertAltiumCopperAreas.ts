@@ -4,7 +4,6 @@ import {
   AltiumPolygonRecord,
   type AltiumRecord,
   AltiumRegionRecord,
-  getPcbRecordPolygonIndex,
 } from "altiumts"
 import type { PcbCopperPour } from "circuit-json"
 import { PcbCopperLayerMap } from "../layers"
@@ -22,7 +21,7 @@ export function convertAltiumCopperAreas(
     getSourceNetId?: (record: AltiumRecord) => string | undefined
   } = {},
 ): PcbCopperPour[] {
-  const polygonIndexesWithRegions = new Set(
+  const polygonsWithRegions = new Set(
     document.records.flatMap((record) => {
       if (
         !(record instanceof AltiumRegionRecord) ||
@@ -30,8 +29,8 @@ export function convertAltiumCopperAreas(
       ) {
         return []
       }
-      const polygonIndex = getPcbRecordPolygonIndex(document, record)
-      return polygonIndex === undefined ? [] : [polygonIndex]
+      const polygon = document.getPolygonForRecord(record)
+      return polygon ? [polygon] : []
     }),
   )
   const polygonIndexes = new Map(
@@ -52,7 +51,7 @@ export function convertAltiumCopperAreas(
       if (
         record.shelved === true ||
         polygonIndex === undefined ||
-        polygonIndexesWithRegions.has(polygonIndex)
+        polygonsWithRegions.has(record)
       ) {
         return []
       }
